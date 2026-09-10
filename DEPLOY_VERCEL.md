@@ -17,9 +17,12 @@ ExcelFlow is architected with a decoupled **Next.js 16 (React 19) Frontend** and
 
 2. **Import into Vercel**:
    - Go to [vercel.com/new](https://vercel.com/new)
-   - Select your GitHub repository (`excel-flow`)
-   - **Framework Preset**: `Next.js` (automatically detected)
-   - **Root Directory**: Select `frontend` (or leave default `/` — the root `vercel.json` will automatically build `frontend`)
+   - Select your GitHub repository (`Excel` or `excel-flow`)
+   - **Root Directory**: Click **Edit** next to Root Directory and select `frontend` *(CRITICAL: since the repository contains both backend and frontend, Vercel must be set to `frontend` so it detects `frontend/package.json`)*
+   - **Framework Preset**: `Next.js` (automatically detected once Root Directory is set to `frontend`)
+
+> 💡 **If you already created the project in Vercel**:
+> Go to **Project Settings** > **General** > **Root Directory** > Click **Edit** > Set to `frontend` > Click **Save**, then go to **Deployments** and click **Redeploy**.
 
 3. **Configure Environment Variables in Vercel**:
    | Variable | Value | Description |

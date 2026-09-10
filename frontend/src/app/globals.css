@@ -1,41 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 :root {
-  /* Primary palette */
-  --color-bg: #0a0e1a;
-  --color-bg-card: #111827;
-  --color-bg-elevated: #1a2236;
-  --color-bg-input: #0f1629;
-  --color-surface: #1e293b;
-  --color-border: #1e3a5f;
-  --color-border-subtle: #162035;
+  /* Neo-Brutalist Core Colors */
+  --bg-main: #FFFDF9;
+  --bg-subtle: #F7F3EA;
+  --bg-card: #FFFFFF;
+  --bg-dark: #121212;
 
-  /* Accent colors */
-  --color-primary: #3b82f6;
-  --color-primary-hover: #2563eb;
-  --color-primary-glow: rgba(59, 130, 246, 0.15);
-  --color-secondary: #06b6d4;
-  --color-accent: #8b5cf6;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
+  --ink: #000000;
+  --ink-secondary: #262626;
+  --ink-muted: #525252;
 
-  /* Text */
-  --color-text: #f1f5f9;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
+  /* High-Contrast Neo-Brutalist Accents */
+  --neo-yellow: #FFE600;
+  --neo-green: #00F076;
+  --neo-cyan: #00D2FF;
+  --neo-pink: #FF3366;
+  --neo-purple: #A855F7;
+  --neo-orange: #FF6B00;
+  --neo-blue: #3B82F6;
 
-  /* Gradients */
-  --gradient-hero: linear-gradient(135deg, #1e3a5f 0%, #0a0e1a 50%, #1a0a2e 100%);
-  --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  --gradient-accent: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-  --gradient-card: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.6) 100%);
+  /* Typography */
+  --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
-  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --radius-lg: 16px;
+  /* Neo-Brutalist Borders & Shadows */
+  --border-thick: 3px solid #000000;
+  --border-medium: 2.5px solid #000000;
+  --border-thin: 2px solid #000000;
+
+  --shadow-sm: 3px 3px 0px #000000;
+  --shadow-md: 5px 5px 0px #000000;
+  --shadow-lg: 8px 8px 0px #000000;
+  --shadow-xl: 12px 12px 0px #000000;
+  --shadow-hover: 7px 7px 0px #000000;
 }
 
 * {
@@ -45,370 +45,305 @@
 }
 
 html, body {
-  font-family: var(--font-family);
-  background: var(--color-bg);
-  color: var(--color-text);
+  font-family: var(--font-body);
+  background-color: var(--bg-main);
+  color: var(--ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: 
+    radial-gradient(#000000 0.85px, transparent 0.85px);
+  background-size: 28px 28px;
 }
 
-/* ─── Glassmorphism Cards ────────────────────────────────────────── */
+/* ─── Neo-Brutalist Typography ───────────────────────────────────── */
 
-.glass-card {
-  background: rgba(17, 24, 39, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ink);
 }
 
-.glass-card:hover {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 30px var(--color-primary-glow);
-  transform: translateY(-2px);
+.font-mono {
+  font-family: var(--font-mono);
 }
 
-.glass-card-static {
-  background: rgba(17, 24, 39, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+/* ─── Neo-Brutalist Cards ────────────────────────────────────────── */
+
+.neo-box {
+  background-color: var(--bg-card);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* ─── Buttons ────────────────────────────────────────────────────── */
-
-.btn-primary {
-  background: var(--gradient-primary);
-  color: white;
-  padding: 12px 32px;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  font-size: 0.95rem;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-  letter-spacing: 0.02em;
+.neo-box:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hover);
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+.neo-box-static {
+  background-color: var(--bg-card);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
 }
 
-.btn-primary:active {
-  transform: translateY(0);
+.neo-box-yellow {
+  background-color: var(--neo-yellow);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
 }
 
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+.neo-box-green {
+  background-color: var(--neo-green);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
 }
 
-.btn-secondary {
-  background: transparent;
-  color: var(--color-text-secondary);
-  padding: 12px 32px;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  font-size: 0.95rem;
-  border: 1px solid var(--color-border);
-  cursor: pointer;
-  transition: all 0.3s;
+.neo-box-cyan {
+  background-color: var(--neo-cyan);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
 }
 
-.btn-secondary:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background: var(--color-primary-glow);
+.neo-box-pink {
+  background-color: var(--neo-pink);
+  color: #FFFFFF;
+  border: var(--border-thick);
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
 }
 
-/* ─── Upload Dropzone ────────────────────────────────────────────── */
+/* ─── Neo-Brutalist Buttons ──────────────────────────────────────── */
 
-.dropzone {
-  border: 2px dashed var(--color-border);
-  border-radius: var(--radius);
-  padding: 48px 24px;
-  text-align: center;
-  transition: all 0.3s;
-  cursor: pointer;
-  background: var(--color-bg-input);
-}
-
-.dropzone:hover,
-.dropzone.active {
-  border-color: var(--color-primary);
-  background: var(--color-primary-glow);
-  box-shadow: 0 0 30px var(--color-primary-glow);
-}
-
-.dropzone.has-file {
-  border-color: var(--color-success);
-  border-style: solid;
-  background: rgba(16, 185, 129, 0.05);
-}
-
-/* ─── Inputs ─────────────────────────────────────────────────────── */
-
-.input-field {
-  width: 100%;
-  padding: 12px 16px;
-  background: var(--color-bg-input);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  color: var(--color-text);
-  font-family: var(--font-family);
-  font-size: 0.9rem;
-  transition: all 0.3s;
-  outline: none;
-}
-
-.input-field:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-glow);
-}
-
-textarea.input-field {
-  resize: vertical;
-  min-height: 160px;
-  line-height: 1.6;
-}
-
-/* ─── Progress Steps ─────────────────────────────────────────────── */
-
-.progress-step {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: var(--radius-sm);
-  transition: all 0.3s;
-}
-
-.progress-step.completed {
-  background: rgba(16, 185, 129, 0.08);
-}
-
-.progress-step.active {
-  background: rgba(59, 130, 246, 0.08);
-}
-
-.step-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
+.neo-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  flex-shrink: 0;
-  transition: all 0.3s;
-}
-
-.step-icon.completed {
-  background: var(--color-success);
-  color: white;
-}
-
-.step-icon.active {
-  background: var(--color-primary);
-  color: white;
-  animation: pulse 2s infinite;
-}
-
-.step-icon.pending {
-  background: var(--color-surface);
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-}
-
-/* ─── Validation Badges ──────────────────────────────────────────── */
-
-.badge-passed {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  background: rgba(16, 185, 129, 0.1);
-  color: var(--color-success);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-}
-
-.badge-failed {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--color-error);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-/* ─── Plan Checklist ─────────────────────────────────────────────── */
-
-.plan-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border-subtle);
-  transition: all 0.2s;
-}
-
-.plan-item:hover {
-  background: rgba(59, 130, 246, 0.05);
-  border-color: var(--color-border);
-}
-
-/* ─── Stat Cards ─────────────────────────────────────────────────── */
-
-.stat-card {
-  background: var(--gradient-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 20px;
-  text-align: center;
-  transition: all 0.3s;
-}
-
-.stat-card .stat-value {
-  font-size: 2rem;
+  gap: 8px;
+  font-family: var(--font-display);
   font-weight: 800;
-  background: var(--gradient-accent);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.stat-card .stat-label {
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 4px;
-}
-
-/* ─── Tabs ───────────────────────────────────────────────────────── */
-
-.tab-group {
-  display: flex;
-  gap: 4px;
-  background: var(--color-bg-card);
-  border-radius: var(--radius-sm);
-  padding: 4px;
-  border: 1px solid var(--color-border-subtle);
-}
-
-.tab-btn {
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  background: transparent;
-  border: none;
+  font-size: 1rem;
+  padding: 12px 28px;
+  border-radius: 10px;
+  border: var(--border-thick);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
-  transition: all 0.2s;
+  text-decoration: none;
+  transition: all 0.12s ease;
+  user-select: none;
 }
 
-.tab-btn:hover {
-  color: var(--color-text-secondary);
+.neo-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hover);
 }
 
-.tab-btn.active {
-  background: var(--color-primary);
-  color: white;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+.neo-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #000000;
 }
 
-/* ─── Animations ─────────────────────────────────────────────────── */
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+.neo-btn-primary {
+  background-color: var(--neo-yellow);
+  color: var(--ink);
+}
+.neo-btn-primary:hover {
+  background-color: #FFEA2E;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+.neo-btn-green {
+  background-color: var(--neo-green);
+  color: var(--ink);
 }
 
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.neo-btn-cyan {
+  background-color: var(--neo-cyan);
+  color: var(--ink);
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.neo-btn-pink {
+  background-color: var(--neo-pink);
+  color: #FFFFFF;
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out forwards;
+.neo-btn-white {
+  background-color: #FFFFFF;
+  color: var(--ink);
 }
 
-.animate-fade-in-up-delay-1 {
-  animation: fadeInUp 0.6s ease-out 0.1s forwards;
-  opacity: 0;
+.neo-btn-dark {
+  background-color: var(--ink);
+  color: #FFFFFF;
+  box-shadow: 4px 4px 0px var(--neo-yellow);
+}
+.neo-btn-dark:hover {
+  box-shadow: 6px 6px 0px var(--neo-yellow);
 }
 
-.animate-fade-in-up-delay-2 {
-  animation: fadeInUp 0.6s ease-out 0.2s forwards;
-  opacity: 0;
+.neo-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 2px 2px 0px #000000 !important;
 }
 
-.animate-fade-in-up-delay-3 {
-  animation: fadeInUp 0.6s ease-out 0.3s forwards;
-  opacity: 0;
+/* ─── Neo-Brutalist Badges & Pills ───────────────────────────────── */
+
+.neo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: var(--border-thin);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 2px 2px 0px #000000;
+  background-color: #FFFFFF;
+  color: var(--ink);
 }
 
-.gradient-text {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.neo-pill-yellow {
+  background-color: var(--neo-yellow);
+  color: var(--ink);
 }
 
-.hero-gradient {
-  background: var(--gradient-hero);
-  background-size: 200% 200%;
-  animation: gradient-shift 8s ease infinite;
+.neo-pill-green {
+  background-color: var(--neo-green);
+  color: var(--ink);
 }
 
-/* ─── Scrollbar ──────────────────────────────────────────────────── */
+.neo-pill-cyan {
+  background-color: var(--neo-cyan);
+  color: var(--ink);
+}
 
+.neo-pill-pink {
+  background-color: var(--neo-pink);
+  color: #FFFFFF;
+}
+
+.neo-pill-purple {
+  background-color: var(--neo-purple);
+  color: #FFFFFF;
+}
+
+/* ─── Neo-Brutalist Inputs ───────────────────────────────────────── */
+
+.neo-input {
+  width: 100%;
+  background-color: #FFFFFF;
+  border: var(--border-thick);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.neo-input:focus {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-md);
+  background-color: #FFFDF0;
+}
+
+/* ─── Neo-Brutalist Ticker / Marquee ─────────────────────────────── */
+
+@keyframes neo-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-neo-marquee {
+  display: flex;
+  width: max-content;
+  animation: neo-marquee 24s linear infinite;
+}
+
+.animate-neo-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* ─── Interactive Wiggle & Sticker Animations ────────────────────── */
+
+@keyframes neo-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-neo-bounce {
+  animation: neo-bounce 2.5s ease-in-out infinite;
+}
+
+.sticker-rotate-1 { transform: rotate(-2deg); }
+.sticker-rotate-2 { transform: rotate(3deg); }
+.sticker-rotate-3 { transform: rotate(-4deg); }
+.sticker-rotate-4 { transform: rotate(2deg); }
+
+/* ─── Excel Grid Mockup Styles ───────────────────────────────────── */
+
+.excel-grid {
+  display: grid;
+  grid-template-columns: 40px repeat(4, 1fr);
+  border: 2px solid #000000;
+  background-color: #FFFFFF;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.excel-cell {
+  border-right: 1px solid #E5E5E5;
+  border-bottom: 1px solid #E5E5E5;
+  padding: 6px 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.excel-header-cell {
+  background-color: #F4F4F4;
+  border-right: 1px solid #D4D4D4;
+  border-bottom: 2px solid #000000;
+  font-weight: 700;
+  text-align: center;
+  padding: 6px 8px;
+}
+
+.excel-row-num {
+  background-color: #F4F4F4;
+  border-right: 2px solid #000000;
+  border-bottom: 1px solid #D4D4D4;
+  text-align: center;
+  font-weight: 700;
+  color: #737373;
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
-
 ::-webkit-scrollbar-track {
-  background: var(--color-bg);
+  background: #FFFDF9;
+  border-left: 2px solid #000000;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+  background: var(--neo-yellow);
+  border: 2px solid #000000;
   border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
+  background: #000000;
 }

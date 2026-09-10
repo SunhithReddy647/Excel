@@ -33,6 +33,7 @@ storage/*.db
 storage/uploads/*
 storage/generated/*
 storage/temp/*
+backend/storage/
 *.db
 *.sqlite
 *.sqlite3
