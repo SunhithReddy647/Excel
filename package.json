@@ -4,7 +4,7 @@
   "private": true,
   "description": "ExcelFlow — Intelligent Excel Assignment Automation Platform",
   "scripts": {
-    "build": "echo Building static assets",
+    "build": "node -e \"const fs=require('fs'); if(!fs.existsSync('public')) fs.mkdirSync('public'); fs.copyFileSync('index.html', 'public/index.html'); console.log('Static site built in public/');\"",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && venv\\Scripts\\python -m uvicorn main:app --reload --port 8000",
     "build:frontend": "cd frontend && npm run build",
