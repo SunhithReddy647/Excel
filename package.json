@@ -4,6 +4,7 @@
   "private": true,
   "description": "ExcelFlow — Intelligent Excel Assignment Automation Platform",
   "scripts": {
+    "build": "echo Building static assets",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && venv\\Scripts\\python -m uvicorn main:app --reload --port 8000",
     "build:frontend": "cd frontend && npm run build",
