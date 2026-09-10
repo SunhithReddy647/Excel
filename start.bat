@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 title ExcelFlow Launcher
 color 0B
 cls
@@ -8,9 +9,12 @@ echo               EXCELFLOW - INTELLIGENT WORKBOOK PLATFORM
 echo =======================================================================
 echo.
 
+:: Anchor to the script directory
+cd /d "%~dp0"
+
 :: 1. Check Python
 python --version >nul 2>&1
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo [ERROR] Python is not found in PATH! Please install Python 3.10+.
     pause
     exit /b 1
@@ -18,7 +22,7 @@ if %errorlevel% neq 0 (
 
 :: 2. Check Node
 node --version >nul 2>&1
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo [ERROR] Node.js is not found in PATH! Please install Node.js 18+.
     pause
     exit /b 1
@@ -33,28 +37,30 @@ if not exist "backend\venv\Scripts\python.exe" (
     backend\venv\Scripts\pip install -r backend\requirements.txt
 )
 
-:: Copy .env if backend/.env is missing
+:: Copy .env if backend\.env is missing
 if not exist "backend\.env" (
     if exist ".env" (
         copy /y ".env" "backend\.env" >nul
         echo [*] Copied root .env to backend\.env
     ) else (
-        copy /y ".env.example" "backend\.env" >nul
-        echo [!] Created default backend\.env. Please add your GEMINI_API_KEY if needed.
+        if exist ".env.example" (
+            copy /y ".env.example" "backend\.env" >nul
+            echo [!] Created backend\.env from template.
+        )
     )
 )
 
-:: Ensure storage directory exists
-if not exist "storage" mkdir storage
-if not exist "storage\uploads" mkdir storage\uploads
-if not exist "storage\generated" mkdir storage\generated
-if not exist "storage\temp" mkdir storage\temp
+:: Ensure storage directories exist
+if not exist "storage" mkdir "storage"
+if not exist "storage\uploads" mkdir "storage\uploads"
+if not exist "storage\generated" mkdir "storage\generated"
+if not exist "storage\temp" mkdir "storage\temp"
 
 :: 4. Setup Frontend Environment
 echo [*] Preparing Frontend...
 if not exist "frontend\node_modules" (
-    echo [*] Installing frontend npm packages (first time only)...
-    cd frontend && npm install && cd ..
+    echo [*] Installing frontend packages...
+    call npm --prefix frontend install
 )
 
 :: Copy frontend .env.local if missing
@@ -70,11 +76,11 @@ echo   - Frontend App: http://localhost:3000 (Next.js Dashboard)
 echo =======================================================================
 echo.
 
-:: 5. Launch Backend in new window
-start "ExcelFlow Backend (Port 8000)" cmd /k "cd backend && venv\Scripts\python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+:: 5. Launch Backend in dedicated window
+start "ExcelFlow Backend (Port 8000)" cmd /k "cd /d ""%~dp0backend"" && venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload"
 
-:: 6. Launch Frontend in new window
-start "ExcelFlow Frontend (Port 3000)" cmd /k "cd frontend && npm run dev"
+:: 6. Launch Frontend in dedicated window
+start "ExcelFlow Frontend (Port 3000)" cmd /k "cd /d ""%~dp0frontend"" && npm run dev"
 
 :: 7. Wait 3 seconds and open browser
 timeout /t 3 /nobreak >nul

@@ -1,6 +1,7 @@
 @echo off
 title Stop ExcelFlow
 color 0C
+cd /d "%~dp0"
 cls
 
 echo =======================================================================
