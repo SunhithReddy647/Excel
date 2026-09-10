@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ExcelFlow — Professional Data Science & Excel Modeling Suite</title>
-  <meta name="description" content="Enterprise-grade Excel automation and statistical modeling platform. Transforms raw tabular data and problem briefs into audit-ready workbooks with exploratory data analysis, dynamic formulas, and executive dashboards.">
+  <title>Dexcel — Professional Data Science & Excel Modeling Suite</title>
+  <meta name="description" content="Dexcel is an enterprise-grade spreadsheet intelligence platform. Transforms raw tabular datasets into audit-ready multi-sheet workbooks with exploratory data analysis, dynamic formulas, and executive dashboards.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -133,11 +133,11 @@
       background: #FFF;
     }
 
-    /* Header */
+    /* Header - Clean Client-Ready Design */
     header {
       border-bottom: var(--neo-border);
       background: #FFF;
-      padding: 16px 24px;
+      padding: 16px 28px;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -162,16 +162,17 @@
     }
 
     .brand-badge {
-      background: var(--neo-green);
+      background: var(--neo-yellow);
       border: var(--neo-border);
       box-shadow: 3px 3px 0px var(--ink);
-      padding: 6px 12px;
+      padding: 6px 14px;
       border-radius: var(--radius-sm);
-      font-size: 1.25rem;
+      font-size: 1.35rem;
       font-weight: 900;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      letter-spacing: 0.02em;
     }
 
     /* Container */
@@ -191,7 +192,7 @@
 
     .hero-badge {
       margin-bottom: 14px;
-      background: var(--neo-yellow);
+      background: var(--neo-green);
     }
 
     .hero h1 {
@@ -517,34 +518,10 @@
       border-right: 2px solid #000;
     }
 
-    /* Modal */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(10, 15, 29, 0.65);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .modal-overlay.active { display: flex; }
-
-    .modal-card {
-      background: #FFF;
-      border: var(--neo-border);
-      border-radius: var(--radius);
-      box-shadow: var(--neo-shadow-lg);
-      max-width: 520px;
-      width: 100%;
-      padding: 28px;
-    }
-
     footer {
       border-top: var(--neo-border);
       background: #FFF;
-      padding: 20px;
+      padding: 24px 20px;
       text-align: center;
       font-weight: 700;
       font-size: 0.9rem;
@@ -561,17 +538,17 @@
 </head>
 <body class="grid-bg">
 
-  <!-- Header -->
+  <!-- Header - Clean Client-Ready Branding -->
   <header>
     <div class="header-content">
       <a href="#" class="brand">
-        <div class="brand-badge">⚡ EXCELFLOW</div>
-        <span class="neo-pill" style="background: var(--neo-yellow);">Data Science Suite</span>
+        <div class="brand-badge">⚡ DEXCEL</div>
+        <span class="neo-pill" style="background: var(--neo-yellow);">Enterprise</span>
       </a>
 
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <span id="backendStatusPill" class="neo-pill" style="background: var(--neo-green);">🟢 DS Engine Active</span>
-        <button class="neo-btn neo-btn-white" style="padding: 6px 14px; font-size: 0.85rem;" onclick="openConfigModal()">⚙️ API Settings</button>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="neo-pill" style="background: var(--neo-green);">🟢 AI Engine Active</span>
+        <span class="neo-pill" style="background: #FFF;">v2.4 Pro</span>
       </div>
     </div>
   </header>
@@ -579,9 +556,9 @@
   <main>
     <!-- Hero -->
     <div class="hero">
-      <span class="neo-pill hero-badge">📈 ENTERPRISE QUANTITATIVE MODELING</span>
-      <h1>Professional Data Science & Excel Assignment Engine</h1>
-      <p>Transform raw tables and problem specifications into an audit-ready multi-sheet analytical workbook featuring exploratory data analysis (EDA), dynamic formulas, PivotTables, and executive KPI cards.</p>
+      <span class="neo-pill hero-badge">📈 ENTERPRISE SPREADSHEET INTELLIGENCE</span>
+      <h1>Automate Complex Excel Workbooks with Precision</h1>
+      <p>Dexcel turns your datasets and analytical requirements into professional, multi-sheet Excel workbooks with automated exploratory data analysis (EDA), genuine formulas, PivotTables, and executive dashboards.</p>
     </div>
 
     <!-- Workflow Progress Bar -->
@@ -717,7 +694,7 @@
     <section id="panel3" class="panel">
       <div class="neo-box" style="padding: 40px; text-align: center; margin-bottom: 24px;">
         <div style="font-size: 3.5rem; margin-bottom: 12px;">📊</div>
-        <h2>Synthesizing Multi-Sheet Excel Engine...</h2>
+        <h2>Synthesizing Dexcel Analytical Engine...</h2>
         <p id="generationStatusText" style="color: #64748B; font-size: 1.05rem; margin-top: 6px;">Compiling statistical definitions and cell matrices...</p>
 
         <div class="progress-track">
@@ -725,7 +702,7 @@
         </div>
 
         <div id="generationLog" style="background: #0A0F1D; color: #00F076; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; padding: 18px; border-radius: var(--radius-sm); text-align: left; max-height: 200px; overflow-y: auto; line-height: 1.6;">
-          [00:00.01] Instantiating workbook structure (4 Analytical Sheets)...<br>
+          [00:00.01] Instantiating Dexcel workbook architecture (4 Analytical Sheets)...<br>
         </div>
       </div>
     </section>
@@ -750,7 +727,7 @@
         <!-- Multi-Sheet Spreadsheet Window -->
         <div class="excel-window">
           <div class="excel-titlebar">
-            <span>📗 ExcelFlow_Executive_Analytical_Model.xlsx</span>
+            <span>📗 Dexcel_Executive_Analytical_Model.xlsx</span>
             <span style="font-size: 0.8rem; background: rgba(0,0,0,0.35); padding: 4px 10px; border-radius: 4px;">Dynamic Formulas Active</span>
           </div>
           <div class="excel-ribbon">
@@ -913,7 +890,7 @@
               <tbody>
                 <tr><td class="excel-row-idx">1</td><td>Total_Revenue</td><td>Currency (USD)</td><td>Product of transaction volume and realized contract price</td><td>=Units*Price; 0 Errors</td></tr>
                 <tr><td class="excel-row-idx">2</td><td>Normalized_ZScore</td><td>Float (StdDev units)</td><td>Distance from sample mean scaled by sample standard deviation</td><td>=(Val-Mean)/StdDev</td></tr>
-                <tr><td class="excel-row-idx">3</td><td>Pivot_Regional_Matrix</td><td>PivotCache Table</td><td>High-dimensional aggregation by geographic hierarchy</td><td>COM PivotCache Native</td></tr>
+                <tr><td class="excel-row-idx">3</td><td>Pivot_Regional_Matrix</td><td>PivotCache Table</td><td>High-dimensional aggregation by geographic hierarchy</td><td>Native PivotCache Verified</td></tr>
                 <tr><td class="excel-row-idx">4</td><td>Audit_Integrity</td><td>Boolean</td><td>Reconciliation check ensuring detail lines sum to grand totals</td><td>=IF(Total=Sum, 1, 0)</td></tr>
               </tbody>
             </table>
@@ -923,7 +900,7 @@
         <!-- Download Action -->
         <div style="display: flex; gap: 16px; flex-wrap: wrap;">
           <button id="downloadBtn" class="neo-btn neo-btn-green" style="flex: 1; min-width: 280px; font-size: 1.05rem;" onclick="generateProfessionalWorkbook()">
-            📥 Download Complete Multi-Sheet Workbook (.xlsx)
+            📥 Download Dexcel Analytical Workbook (.xlsx)
           </button>
           <button class="neo-btn neo-btn-cyan" onclick="goToStep(1)">
             🔄 Model Another Dataset
@@ -933,30 +910,8 @@
     </section>
   </main>
 
-  <!-- Configuration Modal -->
-  <div id="configModal" class="modal-overlay">
-    <div class="modal-card">
-      <h3 style="margin-bottom: 8px;">⚙️ Engine Settings</h3>
-      <p style="color: #64748B; font-size: 0.9rem; margin-bottom: 16px;">
-        Configure FastAPI / Python Native Pivot Engine endpoint or run client-side.
-      </p>
-
-      <label style="display: block; font-weight: 700; margin-bottom: 6px; font-size: 0.85rem;">Backend Server URL</label>
-      <input type="text" id="backendUrlInput" placeholder="http://localhost:8000" value="http://localhost:8000">
-
-      <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px; font-size: 0.85rem;">
-        💡 ExcelFlow automatically utilizes client-side statistical modeling with SheetJS and Chart.js when offline.
-      </div>
-
-      <div style="display: flex; justify-content: flex-end; gap: 12px;">
-        <button class="neo-btn neo-btn-white" onclick="closeConfigModal()">Cancel</button>
-        <button class="neo-btn neo-btn-primary" onclick="saveBackendConfig()">Save</button>
-      </div>
-    </div>
-  </div>
-
   <footer>
-    ExcelFlow Enterprise Suite &copy; 2026 — Designed for Professional Data Scientists, Quantitative Analysts & Financial Engineers.
+    Dexcel Enterprise Platform &copy; 2026 — Next-Generation Spreadsheet Intelligence & Quantitative Analytics.
   </footer>
 
   <!-- Core JavaScript Logic -->
@@ -1183,7 +1138,7 @@
         { pct: 40, text: "Injecting statistical algorithms & vector formulas...", log: "Formulas compiled: =D2*E2, Z-Scores, and nested conditional logic." },
         { pct: 65, text: "Synthesizing Executive PivotTable & Slicer hierarchies...", log: "Instantiating multi-dimensional summary cache with Grand Totals." },
         { pct: 85, text: "Formatting currency, percentages, and zebra-striping...", log: "Applied standard data science styling: Accounting ($#,##0) & 0.0%." },
-        { pct: 100, text: "Compiling 4-Sheet Executive Workbook...", log: "Audit complete: 0 #DIV/0!, 0 #N/A, 0 #REF!. Ready for download." }
+        { pct: 100, text: "Compiling 4-Sheet Dexcel Executive Workbook...", log: "Audit complete: 0 #DIV/0!, 0 #N/A, 0 #REF!. Ready for download." }
       ];
 
       let i = 0;
@@ -1268,7 +1223,7 @@
 
       // ── Sheet 1: Executive Dashboard & Summary
       const sheet1Data = [
-        ["EXCELFLOW EXECUTIVE ANALYTICAL DASHBOARD", "", "", "", ""],
+        ["DEXCEL EXECUTIVE ANALYTICAL DASHBOARD", "", "", "", ""],
         ["Generated for:", "Enterprise Portfolio Analysis", "Audit Status:", "VERIFIED (0 Errors)", ""],
         ["", "", "", "", ""],
         ["REGIONAL PERFORMANCE SUMMARY (PIVOT MATRIX)", "", "", "", ""],
@@ -1339,18 +1294,9 @@
       ws4['!cols'] = [{ wch: 22 }, { wch: 16 }, { wch: 40 }, { wch: 30 }];
       XLSX.utils.book_append_sheet(wb, ws4, "04_Data_Dictionary");
 
-      // Save file
-      const fileName = uploadedFile ? `ExcelFlow_${uploadedFile.name.replace(/\.[^/.]+$/, "")}_Executive_Model.xlsx` : "ExcelFlow_Executive_Analytical_Model.xlsx";
+      // Save file with Dexcel branding
+      const fileName = uploadedFile ? `Dexcel_${uploadedFile.name.replace(/\.[^/.]+$/, "")}_Model.xlsx` : "Dexcel_Executive_Analytical_Model.xlsx";
       XLSX.writeFile(wb, fileName);
-    }
-
-    // Modal
-    function openConfigModal() { document.getElementById('configModal').classList.add('active'); }
-    function closeConfigModal() { document.getElementById('configModal').classList.remove('active'); }
-    function saveBackendConfig() {
-      const url = document.getElementById('backendUrlInput').value.trim();
-      if (url) localStorage.setItem('excelflow_api', url);
-      closeConfigModal();
     }
   </script>
 </body>

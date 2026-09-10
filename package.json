@@ -1,8 +1,8 @@
 {
-  "name": "excel-flow-root",
+  "name": "dexcel",
   "version": "1.0.0",
   "private": true,
-  "description": "ExcelFlow — Intelligent Excel Assignment Automation Platform",
+  "description": "Dexcel — Enterprise Spreadsheet Intelligence & Quantitative Analytics Platform",
   "scripts": {
     "build": "node -e \"const fs=require('fs'); if(!fs.existsSync('public')) fs.mkdirSync('public'); fs.copyFileSync('index.html', 'public/index.html'); console.log('Static site built in public/');\"",
     "dev:frontend": "cd frontend && npm run dev",
