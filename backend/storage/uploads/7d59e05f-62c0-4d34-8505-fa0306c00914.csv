@@ -1,0 +1,17 @@
+Order ID,Month,Region,Salesperson,Product,Customer Type,Units Sold,Unit Price,Unit Cost,Target Units
+ORD001,January,North,Rahul,Laptop Bag,Corporate,120,450,280,100
+ORD002,January,South,Priya,Keyboard,Retail,80,350,200,90
+ORD003,January,East,Amit,Monitor,Corporate,45,5500,3800,50
+ORD004,January,West,Sneha,Office Chair,Retail,60,3200,2100,55
+ORD005,February,North,Rahul,Keyboard,Corporate,95,380,210,100
+ORD006,February,South,Priya,Monitor,Retail,55,5200,3600,60
+ORD007,February,East,Amit,Office Chair,Corporate,70,3100,2000,65
+ORD008,February,West,Sneha,Laptop Bag,Retail,110,420,260,100
+ORD009,March,North,Rahul,Monitor,Corporate,65,5300,3700,60
+ORD010,March,South,Priya,Office Chair,Retail,85,3000,1950,80
+ORD011,March,East,Amit,Laptop Bag,Corporate,130,460,290,120
+ORD012,March,West,Sneha,Keyboard,Retail,75,340,190,80
+ORD013,April,North,Rahul,Office Chair,Corporate,90,3150,2050,85
+ORD014,April,South,Priya,Laptop Bag,Retail,100,430,270,95
+ORD015,April,East,Amit,Keyboard,Corporate,110,360,205,100
+ORD016,April,West,Sneha,Monitor,Corporate,50,5400,3750,55

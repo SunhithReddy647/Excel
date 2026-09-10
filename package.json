@@ -1,0 +1,22 @@
+{
+  "name": "excel-flow-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ExcelFlow — Intelligent Excel Assignment Automation Platform",
+  "scripts": {
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && venv\\Scripts\\python -m uvicorn main:app --reload --port 8000",
+    "build:frontend": "cd frontend && npm run build",
+    "lint:frontend": "cd frontend && npm run lint",
+    "test:backend": "cd backend && venv\\Scripts\\pytest -v",
+    "start": "start.bat"
+  },
+  "keywords": [
+    "excel",
+    "pivottable",
+    "slicers",
+    "fastapi",
+    "nextjs",
+    "ai"
+  ]
+}

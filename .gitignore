@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+backend/venv/
+venv/
+.venv/
+
+# Next.js Build & Cache
+.next/
+frontend/.next/
+out/
+build/
+dist/
+
+# Python Cache & Bytecode
+__pycache__/
+backend/__pycache__/
+backend/*/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+backend/.pytest_cache/
+
+# Environment Variables (Keep secrets safe!)
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env.local
+
+# SQLite Database & Storage Files
+storage/*.db
+storage/uploads/*
+storage/generated/*
+storage/temp/*
+*.db
+*.sqlite
+*.sqlite3
+!storage/uploads/.gitkeep
+!storage/generated/.gitkeep
+!storage/temp/.gitkeep
+
+# Temporary test outputs
+test_*.xlsx
+temp_*.xlsx
+debug_*.py
+
+# Operating System & IDE Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
