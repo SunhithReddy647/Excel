@@ -337,9 +337,9 @@ class WorkbookGenerator:
                         if col_idx > len(analysis.group_by) and isinstance(val, (int, float)):
                             metric_lower = analysis.metric.lower()
                             if any(kw in metric_lower for kw in ("revenue", "cost", "expense", "profit", "price", "salary")):
-                                ws.cell(row=current_row, column=col_idx).number_format = "₹#,##0"
+                                ws.cell(row=current_row, column=col_idx).number_format = "$#,##0"
                             elif "percent" in metric_lower or "margin" in metric_lower or "rate" in metric_lower:
-                                ws.cell(row=current_row, column=col_idx).number_format = "0.00%"
+                                ws.cell(row=current_row, column=col_idx).number_format = "0.0%"
                             else:
                                 ws.cell(row=current_row, column=col_idx).number_format = "#,##0"
 
@@ -490,6 +490,43 @@ class WorkbookGenerator:
                     "format": kpi.format,
                 })
             dashboard.write_kpis(kpi_data)
+
+        # Summary Breakdown Tables on Dashboard
+        if self.plan.analyses and self.analysis_results:
+            primary_analysis = self.plan.analyses[0]
+            result_df = self.analysis_results.get(primary_analysis.name)
+            if result_df is not None and not result_df.empty:
+                dashboard.write_section_header(f"Performance Summary: {primary_analysis.name}")
+                tbl_header_row = dashboard.current_row
+                for col_idx, col_name in enumerate(result_df.columns, 1):
+                    ws.cell(row=tbl_header_row, column=col_idx, value=col_name)
+                _format_header_row(ws, tbl_header_row, len(result_df.columns))
+                dashboard.current_row += 1
+
+                tbl_start = dashboard.current_row
+                is_curr = any(kw in primary_analysis.metric.lower() for kw in ("revenue", "cost", "sales", "amount", "profit", "price"))
+                for _, r in result_df.iterrows():
+                    r_idx = dashboard.current_row
+                    cat_val = r[result_df.columns[0]]
+                    ws.cell(row=r_idx, column=1, value=cat_val)
+
+                    # Dynamic SUMIFS formula referencing DataTable
+                    dim_col = primary_analysis.group_by[0] if primary_analysis.group_by else self.df.columns[0]
+                    metric_col = primary_analysis.metric
+                    formula = f'=SUMIFS({self.table_name}[{metric_col}], {self.table_name}[{dim_col}], "{cat_val}")'
+                    metric_cell = ws.cell(row=r_idx, column=2, value=formula)
+                    metric_cell.number_format = "$#,##0" if is_curr else "#,##0"
+                    self.formula_count += 1
+                    dashboard.current_row += 1
+
+                # Grand Total row
+                tot_row = dashboard.current_row
+                ws.cell(row=tot_row, column=1, value="Grand Total").font = Font(name="Calibri", size=11, bold=True)
+                tot_cell = ws.cell(row=tot_row, column=2, value=f"=SUM(B{tbl_start}:B{tot_row-1})")
+                tot_cell.font = Font(name="Calibri", size=11, bold=True)
+                tot_cell.number_format = "$#,##0" if is_curr else "#,##0"
+                self.formula_count += 1
+                dashboard.current_row += 2
 
         # Charts on dashboard
         if dash_spec.chart_refs:
