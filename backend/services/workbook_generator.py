@@ -450,7 +450,7 @@ class WorkbookGenerator:
     # ─── Dashboard Sheet ─────────────────────────────────────────────
 
     def _create_dashboard_sheet(self, sheet_name: str):
-        """Create the dashboard sheet with KPIs, charts, and filters."""
+        """Create the dashboard sheet with KPIs, breakdown tables, charts, and filters."""
         ws = self.wb.create_sheet(title=sheet_name)
         dashboard = DashboardEngine(ws)
         dashboard._set_column_widths()
@@ -493,48 +493,26 @@ class WorkbookGenerator:
 
         # Summary Breakdown Tables on Dashboard
         if self.plan.analyses and self.analysis_results:
-            for analysis in self.plan.analyses[:3]:
+            for analysis in self.plan.analyses[:4]:
                 result_df = self.analysis_results.get(analysis.name)
                 if result_df is None or result_df.empty:
                     continue
-                dashboard.write_section_header(f"Performance Breakdown: {analysis.name}")
-                tbl_header_row = dashboard.current_row
-                for col_idx, col_name in enumerate(result_df.columns, 1):
-                    ws.cell(row=tbl_header_row, column=col_idx, value=col_name)
-                _format_header_row(ws, tbl_header_row, len(result_df.columns))
-                dashboard.current_row += 1
 
-                tbl_start = dashboard.current_row
-                is_curr = any(kw in analysis.metric.lower() for kw in ("revenue", "cost", "sales", "amount", "profit", "price"))
-                for _, r in result_df.iterrows():
-                    r_idx = dashboard.current_row
-                    cat_val = r[result_df.columns[0]]
-                    ws.cell(row=r_idx, column=1, value=cat_val)
+                dim_col = analysis.group_by[0] if analysis.group_by else self.df.columns[0]
+                is_curr = any(kw in analysis.metric.lower() for kw in (
+                    "revenue", "cost", "sales", "amount", "profit", "price", "income", "spend"
+                ))
 
-                    # Dynamic formula referencing DataTable
-                    dim_col = analysis.group_by[0] if analysis.group_by else self.df.columns[0]
-                    metric_col = analysis.metric
-                    agg = analysis.aggregation.upper()
-                    if agg == "AVERAGE":
-                        formula = f'=AVERAGEIFS({self.table_name}[{metric_col}], {self.table_name}[{dim_col}], "{cat_val}")'
-                    elif agg in ("COUNT", "COUNTA"):
-                        formula = f'=COUNTIFS({self.table_name}[{dim_col}], "{cat_val}")'
-                    else:
-                        formula = f'=SUMIFS({self.table_name}[{metric_col}], {self.table_name}[{dim_col}], "{cat_val}")'
-                    metric_cell = ws.cell(row=r_idx, column=2, value=formula)
-                    metric_cell.number_format = "$#,##0" if is_curr else "#,##0"
-                    self.formula_count += 1
-                    dashboard.current_row += 1
-
-                # Grand Total row
-                tot_row = dashboard.current_row
-                ws.cell(row=tot_row, column=1, value="Grand Total").font = Font(name="Calibri", size=11, bold=True)
-                tot_formula = f"=SUM(B{tbl_start}:B{tot_row-1})" if agg != "AVERAGE" else f"=AVERAGE(B{tbl_start}:B{tot_row-1})"
-                tot_cell = ws.cell(row=tot_row, column=2, value=tot_formula)
-                tot_cell.font = Font(name="Calibri", size=11, bold=True)
-                tot_cell.number_format = "$#,##0" if is_curr else "#,##0"
-                self.formula_count += 1
-                dashboard.current_row += 2
+                dashboard.write_breakdown_table(
+                    title=f"Performance Breakdown: {analysis.name}",
+                    result_df=result_df,
+                    metric_col=analysis.metric,
+                    dim_col=dim_col,
+                    aggregation=analysis.aggregation,
+                    table_name=self.table_name,
+                    is_currency=is_curr,
+                )
+                self.formula_count += len(result_df) + 1  # data rows + grand total
 
         # Charts on dashboard
         if dash_spec.chart_refs:
@@ -599,14 +577,7 @@ class WorkbookGenerator:
 
         # Filters note
         if self.plan.filters:
-            dashboard.write_section_header("Applied Filters")
-            for f in self.plan.filters:
-                row = dashboard.current_row
-                ws.cell(row=row, column=1, value=f"✓ {f.field}")
-                ws.cell(row=row, column=1).font = Font(name="Calibri", size=10, color="2CA58D")
-                ws.cell(row=row, column=3, value=f"Type: {f.filter_type} (AutoFilter on Raw Data sheet)")
-                ws.cell(row=row, column=3).font = Font(name="Calibri", size=10, color="6B7B8D")
-                dashboard.current_row += 1
+            dashboard.write_filters_section(self.plan.filters)
 
     # ─── Assignment Sheet ────────────────────────────────────────────
 

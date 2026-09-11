@@ -3,6 +3,7 @@ API routes for ExcelFlow — handles all HTTP endpoints with SQLite database per
 """
 
 import os
+import re
 import uuid
 import json
 import asyncio

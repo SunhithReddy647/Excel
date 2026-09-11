@@ -1,1539 +1,569 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-  <title>Excel Maker Studio — ExcelFlow</title>
-  <meta name="description" content="AI-powered executive Excel dashboard studio. Upload CSV/XLSX, type business questions, and download a zero-hallucination workbook with dynamic formulas and slicers.">
+  <title>Dashboard Maker Studio — ExcelFlow</title>
+  <meta name="description" content="Upload your dataset, describe your business question, and generate a polished Excel dashboard with KPIs, charts, and live formulas.">
   <style>
-    
     :root {
-      --bg: #FBF8F3;
-      --bg-alt: #F3EFE6;
-      --ink: #0A0A0A;
-      --card-bg: #FFFFFF;
-      --excel: #107C41;
-      --excel-hover: #0D6535;
-      --excel-light: #EBF7EE;
-      --yellow: #FFE600;
-      --yellow-light: #FFFBE6;
-      --blue: #2563EB;
-      --blue-light: #EFF6FF;
-      --coral: #FF5A5F;
-      --coral-light: #FFF1F2;
-      --purple: #8B5CF6;
-      --purple-light: #F5F3FF;
-      --muted: #525252;
-      --border-w: 2.5px;
-      --radius: 8px;
-      --radius-sm: 5px;
-      --radius-pill: 9999px;
-      --shadow-sm: 2px 2px 0px var(--ink);
-      --shadow-md: 4px 4px 0px var(--ink);
-      --shadow-lg: 6px 6px 0px var(--ink);
-      --shadow-xl: 8px 8px 0px var(--ink);
+      --bg: #FBF8F3; --bg-alt: #F3EFE6; --ink: #0A0A0A; --card-bg: #FFFFFF;
+      --excel: #107C41; --excel-hover: #0D6535; --excel-light: #EBF7EE;
+      --yellow: #FFE600; --yellow-light: #FFFBE6; --blue: #2563EB; --blue-light: #EFF6FF;
+      --coral: #FF5A5F; --coral-light: #FFF1F2; --purple: #8B5CF6; --purple-light: #F5F3FF;
+      --muted: #525252; --border-w: 2.5px; --radius: 8px; --radius-sm: 5px;
+      --shadow-sm: 2px 2px 0px var(--ink); --shadow-md: 4px 4px 0px var(--ink);
+      --shadow-lg: 6px 6px 0px var(--ink); --shadow-xl: 8px 8px 0px var(--ink);
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background-color: var(--bg);
-      color: var(--ink);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      line-height: 1.5;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
+      background-color: var(--bg); color: var(--ink);
+      font-family: 'Inter', -apple-system, sans-serif; line-height: 1.6;
+      min-height: 100vh; display: flex; flex-direction: column;
       background-image: radial-gradient(var(--ink) 0.65px, transparent 0.65px);
       background-size: 20px 20px;
     }
-
     .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .container { width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 16px; }
 
-    /* Neo-Brutalist Layout Shell */
-    .container {
-      width: 100%;
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 0 16px;
+    header { background: var(--card-bg); border-bottom: var(--border-w) solid var(--ink); position: sticky; top: 0; z-index: 1000; }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+    .logo { display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 1.25rem; text-decoration: none; color: var(--ink); }
+    .logo-icon { width: 36px; height: 36px; background: var(--excel); color: #fff; border: var(--border-w) solid var(--ink); border-radius: var(--radius-sm); display: grid; place-items: center; font-size: 0.875rem; font-weight: 800; box-shadow: var(--shadow-sm); }
+    nav { display: flex; align-items: center; gap: 8px; }
+    nav a { text-decoration: none; color: var(--ink); font-weight: 600; font-size: 0.875rem; padding: 8px 14px; border-radius: var(--radius-sm); border: var(--border-w) solid transparent; transition: all 0.15s; }
+    nav a:hover { background: var(--bg-alt); border-color: var(--ink); box-shadow: var(--shadow-sm); }
+    nav a.active { background: var(--yellow); border-color: var(--ink); box-shadow: var(--shadow-sm); }
+    .nav-toggle { display: none; background: none; border: none; cursor: pointer; width: 36px; height: 36px; position: relative; }
+    .nav-toggle span { display: block; width: 22px; height: 2.5px; background: var(--ink); border-radius: 2px; position: absolute; left: 7px; transition: all 0.25s; }
+    .nav-toggle span:nth-child(1) { top: 10px; } .nav-toggle span:nth-child(2) { top: 17px; } .nav-toggle span:nth-child(3) { top: 24px; }
+
+    /* ─── Studio Layout ─── */
+    .studio { padding: 32px 0 64px; }
+    .studio-header { text-align: center; margin-bottom: 32px; }
+    .studio-header h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(1.5rem, 4vw, 2.25rem); font-weight: 900; }
+    .studio-header p { color: var(--muted); font-size: 0.95rem; max-width: 500px; margin: 8px auto 0; }
+
+    .studio-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
     }
 
-    /* Neo-Brutalist Header */
-    header {
-      background: #FFFFFF;
-      border-bottom: var(--border-w) solid var(--ink);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
+    .panel {
+      background: var(--card-bg); border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius); box-shadow: var(--shadow-lg);
+      overflow: hidden;
     }
-
-    .nav-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 72px;
+    .panel-header {
+      padding: 16px 20px; border-bottom: var(--border-w) solid var(--ink);
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-alt);
     }
-
-    .brand-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: var(--ink);
-      font-weight: 900;
-      font-size: 1.25rem;
-      letter-spacing: -0.03em;
+    .panel-header h2 { font-size: 1rem; font-weight: 800; }
+    .panel-header .badge {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+      font-weight: 700; padding: 3px 8px; border-radius: var(--radius-sm);
+      border: var(--border-w) solid var(--ink); box-shadow: 1px 1px 0 var(--ink);
     }
+    .panel-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
 
-    .brand-icon {
-      width: 38px;
-      height: 38px;
-      background: var(--excel);
-      color: white;
-      border: var(--border-w) solid var(--ink);
-      box-shadow: 2.5px 2.5px 0px var(--ink);
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 1.1rem;
+    /* Drop zone */
+    .drop-zone {
+      border: 2.5px dashed var(--ink); border-radius: var(--radius);
+      padding: 40px 20px; text-align: center; cursor: pointer;
+      transition: all 0.2s; background: var(--bg);
     }
-
-    .nav-menu {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      list-style: none;
+    .drop-zone:hover, .drop-zone.drag-over {
+      background: var(--excel-light); border-color: var(--excel);
+      transform: translate(-2px, -2px); box-shadow: var(--shadow-md);
     }
+    .drop-zone .drop-icon { font-size: 2.5rem; margin-bottom: 8px; display: block; }
+    .drop-zone p { font-size: 0.95rem; font-weight: 700; }
+    .drop-zone .drop-hint { font-size: 0.8rem; color: var(--muted); margin-top: 4px; font-weight: 400; }
+    .drop-zone.loaded { border-style: solid; border-color: var(--excel); background: var(--excel-light); }
 
-    .nav-item a {
-      display: inline-block;
-      text-decoration: none;
-      color: var(--ink);
-      font-weight: 700;
-      font-size: 0.88rem;
-      padding: 8px 14px;
-      border: var(--border-w) solid transparent;
-      border-radius: var(--radius-sm);
-      transition: all 0.12s ease;
+    /* Question */
+    .question-area {
+      width: 100%; min-height: 120px; border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius-sm); padding: 14px; font-family: 'Inter', sans-serif;
+      font-size: 0.9rem; resize: vertical; line-height: 1.6;
+      transition: box-shadow 0.15s;
     }
+    .question-area:focus { outline: none; box-shadow: var(--shadow-md); }
+    .question-area::placeholder { color: #999; }
 
-    .nav-item a:hover {
-      background: var(--yellow);
-      border-color: var(--ink);
-      box-shadow: 2px 2px 0px var(--ink);
-      transform: translate(-1px, -1px);
+    /* Question file upload */
+    .q-file-row { display: flex; gap: 8px; align-items: center; }
+    .q-file-btn {
+      padding: 8px 14px; font-size: 0.8rem; font-weight: 700;
+      border: var(--border-w) solid var(--ink); border-radius: var(--radius-sm);
+      background: var(--bg-alt); cursor: pointer; transition: all 0.15s;
     }
+    .q-file-btn:hover { background: var(--yellow-light); box-shadow: var(--shadow-sm); }
+    .q-file-name { font-size: 0.8rem; color: var(--muted); font-style: italic; }
 
-    .nav-item a.active {
-      background: var(--ink);
-      color: #FFFFFF;
-      border-color: var(--ink);
-      box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+    /* Example questions */
+    .examples-label { font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .examples-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .example-chip {
+      padding: 5px 12px; font-size: 0.75rem; font-weight: 600;
+      border: var(--border-w) solid var(--ink); border-radius: var(--radius-sm);
+      background: var(--card-bg); cursor: pointer; transition: all 0.15s;
+      box-shadow: 1px 1px 0 var(--ink);
     }
+    .example-chip:hover { background: var(--yellow-light); transform: translate(-1px, -1px); box-shadow: var(--shadow-sm); }
 
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    /* Title input */
+    .title-input {
+      width: 100%; padding: 10px 14px; font-size: 0.9rem; font-weight: 600;
+      border: var(--border-w) solid var(--ink); border-radius: var(--radius-sm);
     }
+    .title-input:focus { outline: none; box-shadow: var(--shadow-sm); }
 
-    .btn-brutal {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-weight: 800;
-      font-size: 0.9rem;
-      text-decoration: none;
-      padding: 9px 18px;
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-md);
-      cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
-      white-space: nowrap;
+    /* Generate button */
+    .btn-generate {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 16px 24px; font-size: 1rem; font-weight: 800;
+      border: var(--border-w) solid var(--ink); border-radius: var(--radius);
+      background: var(--excel); color: #fff; cursor: pointer;
+      box-shadow: var(--shadow-lg); transition: all 0.15s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
+    .btn-generate:hover { background: var(--excel-hover); transform: translate(-3px, -3px); box-shadow: var(--shadow-xl); }
+    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-generate.loading { animation: pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 
-    .btn-brutal:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: var(--shadow-lg);
+    /* Progress */
+    .progress-panel { display: none; }
+    .progress-panel.show { display: block; }
+    .progress-bar-outer {
+      width: 100%; height: 12px; background: var(--bg-alt);
+      border: var(--border-w) solid var(--ink); border-radius: 6px;
+      overflow: hidden; margin-bottom: 12px;
     }
-
-    .btn-brutal:active {
-      transform: translate(2px, 2px);
-      box-shadow: 0px 0px 0px var(--ink);
+    .progress-bar-inner {
+      height: 100%; background: var(--excel);
+      transition: width 0.4s ease; width: 0%;
     }
-
-    .btn-primary {
-      background: var(--excel);
-      color: #FFFFFF;
+    .progress-step { font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
+    .progress-log {
+      background: var(--ink); color: #fff; border-radius: var(--radius-sm);
+      padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+      max-height: 180px; overflow-y: auto;
     }
+    .progress-log .log-entry { margin-bottom: 4px; }
+    .log-ok { color: #4ade80; } .log-err { color: #f87171; } .log-info { color: #60a5fa; }
 
-    .btn-primary:hover {
-      background: var(--excel-hover);
+    /* Result panel */
+    .result-panel { display: none; }
+    .result-panel.show { display: block; }
+    .result-card {
+      background: var(--excel-light); border: var(--border-w) solid var(--excel);
+      border-radius: var(--radius); padding: 24px;
     }
-
-    .btn-secondary {
-      background: #FFFFFF;
-      color: var(--ink);
+    .result-card h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 12px; color: var(--excel); }
+    .result-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .result-stat {
+      background: var(--card-bg); border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius-sm); padding: 12px; text-align: center;
+      box-shadow: var(--shadow-sm);
     }
-
-    .btn-yellow {
-      background: var(--yellow);
-      color: var(--ink);
+    .result-stat .val { font-family: 'JetBrains Mono', monospace; font-size: 1.4rem; font-weight: 800; color: var(--excel); display: block; }
+    .result-stat .label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--muted); }
+    .btn-download {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; font-size: 1rem; font-weight: 800;
+      border: var(--border-w) solid var(--ink); border-radius: var(--radius);
+      background: var(--excel); color: #fff; cursor: pointer;
+      box-shadow: var(--shadow-md); text-decoration: none; transition: all 0.15s;
     }
+    .btn-download:hover { background: var(--excel-hover); transform: translate(-2px, -2px); box-shadow: var(--shadow-lg); }
 
-    .btn-coral {
-      background: var(--coral);
-      color: #FFFFFF;
+    /* Error panel */
+    .error-panel { display: none; }
+    .error-panel.show { display: block; }
+    .error-card {
+      background: var(--coral-light); border: var(--border-w) solid var(--coral);
+      border-radius: var(--radius); padding: 20px;
     }
+    .error-card h3 { color: var(--coral); font-size: 1rem; margin-bottom: 8px; }
+    .error-card p { font-size: 0.9rem; color: var(--muted); }
 
-    /* Mobile Hamburger */
-    .mobile-menu-toggle {
-      display: none;
-      background: #FFFFFF;
-      border: var(--border-w) solid var(--ink);
-      box-shadow: 2px 2px 0px var(--ink);
-      border-radius: var(--radius-sm);
-      padding: 8px 12px;
-      cursor: pointer;
-      font-weight: 900;
-      font-size: 1.1rem;
-    }
+    /* Data preview */
+    .preview-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 12px; }
+    .preview-table th { background: var(--ink); color: #fff; text-align: left; padding: 6px 10px; font-weight: 700; position: sticky; top: 0; }
+    .preview-table td { padding: 5px 10px; border-bottom: 1px solid #e2e8f0; }
+    .preview-table tr:nth-child(even) td { background: #f8fafc; }
+    .preview-scroll { max-height: 220px; overflow: auto; border: var(--border-w) solid var(--ink); border-radius: var(--radius-sm); }
 
-    .mobile-drawer {
-      display: none;
-      flex-direction: column;
-      gap: 10px;
-      padding: 16px;
-      background: #FFFFFF;
-      border-bottom: var(--border-w) solid var(--ink);
-    }
+    .data-info { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+    .data-info span { font-size: 0.8rem; font-weight: 600; padding: 4px 10px; background: var(--bg-alt); border: 1px solid var(--ink); border-radius: var(--radius-sm); }
 
-    .mobile-drawer.open {
-      display: flex;
-    }
+    footer { background: var(--ink); color: #fff; border-top: var(--border-w) solid var(--ink); padding: 32px 0 16px; margin-top: auto; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .footer-inner a { color: #fff; text-decoration: none; font-size: 0.85rem; opacity: 0.7; }
+    .footer-copy { font-size: 0.8rem; opacity: 0.5; }
 
-    .mobile-drawer a {
-      text-decoration: none;
-      color: var(--ink);
-      font-weight: 800;
-      font-size: 1rem;
-      padding: 12px 16px;
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius);
-      background: var(--bg);
-      box-shadow: 3px 3px 0px var(--ink);
-    }
-
-    .mobile-drawer a.active {
-      background: var(--yellow);
-    }
-
-    /* Stickers & Eyebrows */
-    .sticker {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.76rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 4px 10px;
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius-pill);
-      box-shadow: 2px 2px 0px var(--ink);
-      background: var(--yellow);
-    }
-
-    .sticker-excel { background: var(--excel-light); color: var(--excel); }
-    .sticker-ai { background: var(--purple-light); color: var(--purple); }
-    .sticker-blue { background: var(--blue-light); color: var(--blue); }
-
-    /* Neo-Brutal Cards */
-    .brutal-card {
-      background: var(--card-bg);
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-md);
-      padding: 24px;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .brutal-card:hover {
-      box-shadow: var(--shadow-lg);
-    }
-
-    /* Footer */
-    footer {
-      margin-top: auto;
-      background: #FFFFFF;
-      border-top: var(--border-w) solid var(--ink);
-      padding: 44px 16px 36px;
-    }
-
-    .footer-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 20px;
-    }
-
-    .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px 24px;
-      list-style: none;
-    }
-
-    .footer-links a {
-      text-decoration: none;
-      color: var(--ink);
-      font-weight: 700;
-      font-size: 0.88rem;
-      border-bottom: 2px solid transparent;
-    }
-
-    .footer-links a:hover {
-      border-bottom-color: var(--ink);
-    }
-
-    .footer-bottom {
-      font-size: 0.82rem;
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    /* Responsive Queries */
-    @media (max-width: 840px) {
-      .nav-menu { display: none; }
-      .mobile-menu-toggle { display: block; }
-      .nav-actions .btn-secondary { display: none; }
+    @media (max-width: 768px) {
+      nav { display: none; } .nav-toggle { display: block; }
+      nav.open { display: flex; flex-direction: column; position: absolute; top: 60px; left: 0; right: 0; background: var(--card-bg); border-bottom: var(--border-w) solid var(--ink); padding: 16px; box-shadow: var(--shadow-lg); z-index: 999; }
+      .studio-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 480px) {
-      .btn-brutal { padding: 8px 14px; font-size: 0.84rem; }
-      .nav-actions { gap: 6px; }
-    }
-
-
-    /* Maker Studio Layout */
-    .maker-wrap {
-      max-width: 860px;
-      margin: 36px auto 70px;
-    }
-
-    .maker-header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    .maker-title {
-      font-size: clamp(2rem, 4vw, 2.8rem);
-      font-weight: 900;
-      letter-spacing: -0.035em;
-      margin-bottom: 10px;
-    }
-
-    .maker-desc {
-      font-size: 1.05rem;
-      color: var(--muted);
-      max-width: 650px;
-      margin: 0 auto;
-      font-weight: 500;
-    }
-
-    /* Cards Stack */
-    .console-card {
-      background: #FFFFFF;
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-lg);
-      padding: clamp(20px, 4vw, 36px);
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    /* Dropzone */
-    .dropzone {
-      border: 3px dashed var(--ink);
-      border-radius: var(--radius);
-      padding: clamp(28px, 5vw, 44px) 20px;
-      text-align: center;
-      background: var(--bg);
-      cursor: pointer;
-      position: relative;
-      transition: all 0.15s ease;
-    }
-
-    .dropzone:hover, .dropzone.drag-over {
-      background: var(--yellow-light);
-      border-color: var(--ink);
-      box-shadow: 4px 4px 0px var(--ink);
-      transform: translate(-1px, -1px);
-    }
-
-    .dropzone input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-    }
-
-    .dropzone-icon {
-      font-size: 3rem;
-      margin-bottom: 12px;
-      display: inline-block;
-    }
-
-    .dropzone-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      margin-bottom: 6px;
-    }
-
-    .dropzone-sub {
-      font-size: 0.88rem;
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    /* File Banner */
-    .file-banner {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--blue-light);
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .file-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .file-icon-badge {
-      width: 44px;
-      height: 44px;
-      background: var(--excel);
-      color: white;
-      border: 2px solid var(--ink);
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      font-weight: 900;
-    }
-
-    .file-details {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .file-name {
-      font-weight: 800;
-      font-size: 1rem;
-      letter-spacing: -0.01em;
-    }
-
-    .file-stats {
-      font-size: 0.82rem;
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    .btn-remove-file {
-      background: #FFFFFF;
-      border: 2px solid var(--ink);
-      border-radius: var(--radius-sm);
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-weight: 900;
-      color: var(--coral);
-      box-shadow: 2px 2px 0px var(--ink);
-      transition: transform 0.1s;
-    }
-
-    .btn-remove-file:hover {
-      transform: translate(-1px, -1px);
-      box-shadow: 3px 3px 0px var(--ink);
-    }
-
-    /* Question & Objective Block */
-    .question-card {
-      background: var(--bg);
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius);
-      padding: 22px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .question-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .question-lbl {
-      font-weight: 800;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .question-input {
-      width: 100%;
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius-sm);
-      padding: 12px 14px;
-      font-family: inherit;
-      font-size: 0.92rem;
-      font-weight: 600;
-      outline: none;
-      resize: vertical;
-      background: #FFFFFF;
-      transition: box-shadow 0.15s ease;
-      line-height: 1.5;
-    }
-
-    .question-input:focus {
-      box-shadow: 3px 3px 0px var(--ink);
-    }
-
-    /* Quick Question Chips */
-    .chips-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      margin-top: 12px;
-    }
-
-    .chips-label {
-      font-size: 0.76rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .q-chip {
-      background: #FFFFFF;
-      border: 2px solid var(--ink);
-      border-radius: var(--radius-pill);
-      padding: 5px 12px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--ink);
-      cursor: pointer;
-      box-shadow: 2px 2px 0px var(--ink);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
-    }
-
-    .q-chip:hover {
-      background: var(--yellow);
-      transform: translate(-1px, -1px);
-      box-shadow: 3px 3px 0px var(--ink);
-    }
-
-    /* Sample Datasets Row */
-    .samples-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .samples-title {
-      font-size: 0.82rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-    }
-
-    .sample-btn-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .btn-sample {
-      background: #FFFFFF;
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius);
-      padding: 8px 16px;
-      font-size: 0.86rem;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 2.5px 2.5px 0px var(--ink);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.1s ease;
-    }
-
-    .btn-sample:hover {
-      background: var(--bg-alt);
-      transform: translate(-1px, -1px);
-      box-shadow: 4px 4px 0px var(--ink);
-    }
-
-    .btn-sample.active {
-      background: var(--yellow);
-      box-shadow: 4px 4px 0px var(--ink);
-      transform: translate(-1px, -1px);
-    }
-
-    /* Title Input */
-    .title-field-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .title-input {
-      width: 100%;
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius-sm);
-      padding: 12px 14px;
-      font-family: inherit;
-      font-size: 0.95rem;
-      font-weight: 600;
-      outline: none;
-      background: #FFFFFF;
-    }
-
-    .title-input:focus {
-      box-shadow: 3px 3px 0px var(--ink);
-    }
-
-    /* Build Button */
-    .btn-execute {
-      background: var(--excel);
-      color: #FFFFFF;
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-lg);
-      padding: 16px 28px;
-      font-size: 1.15rem;
-      font-weight: 900;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      transition: all 0.12s ease;
-    }
-
-    .btn-execute:hover:not(:disabled) {
-      background: var(--excel-hover);
-      transform: translate(-2px, -2px);
-      box-shadow: var(--shadow-xl);
-    }
-
-    .btn-execute:active:not(:disabled) {
-      transform: translate(2px, 2px);
-      box-shadow: 0px 0px 0px var(--ink);
-    }
-
-    .btn-execute:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    /* Stepper Panel */
-    .stepper-panel {
-      display: none;
-      background: #FFFFFF;
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--shadow-md);
-      margin-top: 10px;
-    }
-
-    .stepper-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-weight: 800;
-      font-size: 0.95rem;
-      margin-bottom: 16px;
-      border-bottom: 2px solid var(--bg-alt);
-      padding-bottom: 12px;
-    }
-
-    .step-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .step-node {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--muted);
-    }
-
-    .step-num {
-      width: 28px;
-      height: 28px;
-      border: 2px solid var(--ink);
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 0.85rem;
-      background: #FFFFFF;
-      color: var(--ink);
-      box-shadow: 2px 2px 0px var(--ink);
-    }
-
-    .step-node.active {
-      color: var(--ink);
-      font-weight: 800;
-    }
-
-    .step-node.active .step-num {
-      background: var(--yellow);
-    }
-
-    .step-node.done {
-      color: var(--excel);
-    }
-
-    .step-node.done .step-num {
-      background: var(--excel);
-      color: #FFFFFF;
-    }
-
-    /* Success Card */
-    .success-card {
-      display: none;
-      background: var(--yellow-light);
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-xl);
-      padding: clamp(24px, 5vw, 36px);
-      text-align: center;
-      margin-top: 16px;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .success-badge {
-      display: inline-block;
-      background: var(--excel);
-      color: #FFFFFF;
-      border: var(--border-w) solid var(--ink);
-      padding: 6px 18px;
-      border-radius: var(--radius-pill);
-      font-weight: 900;
-      font-size: 0.95rem;
-      box-shadow: 3px 3px 0px var(--ink);
-      margin: 0 auto;
-    }
-
-    .ai-briefing-box {
-      background: #FFFFFF;
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      text-align: left;
-      box-shadow: var(--shadow-sm);
-      font-size: 0.92rem;
-      line-height: 1.6;
-      font-weight: 600;
-    }
-
-    .result-metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-    }
-
-    .metric-cell {
-      background: #FFFFFF;
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius-sm);
-      padding: 12px;
-      box-shadow: 2px 2px 0px var(--ink);
-      text-align: center;
-    }
-
-    .metric-lbl {
-      font-size: 0.75rem;
-      font-weight: 800;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .metric-val {
-      font-size: 1.15rem;
-      font-weight: 900;
-      color: var(--ink);
-    }
-
-    .btn-download-now {
-      background: var(--excel);
-      color: #FFFFFF;
-      font-size: 1.15rem;
-      padding: 16px 32px;
-      border: var(--border-w) solid var(--ink);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-lg);
-      cursor: pointer;
-      font-weight: 900;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      transition: all 0.1s ease;
-      width: 100%;
-    }
-
-    .btn-download-now:hover {
-      background: var(--excel-hover);
-      transform: translate(-2px, -2px);
-      box-shadow: var(--shadow-xl);
+      .result-stats { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
-  
   <header>
-    <div class="container">
-      <nav class="nav-bar">
-        <a href="index.html" class="brand-logo font-display">
-          <div class="brand-icon">X</div>
-          <span>ExcelFlow</span>
-        </a>
-
-        <ul class="nav-menu">
-          <li class="nav-item"><a href="index.html" class="">Home</a></li>
-          <li class="nav-item"><a href="maker.html" class="active">Excel Maker Studio</a></li>
-          <li class="nav-item"><a href="info.html" class="">Tech Architecture</a></li>
-          <li class="nav-item"><a href="tools.html" class="">Data Utilities</a></li>
-        </ul>
-
-        <div class="nav-actions">
-          <a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download class="btn-brutal btn-secondary font-display" title="Download Reference Workbook">
-            <span>⬇ Reference .xlsx</span>
-          </a>
-          <a href="maker.html" class="btn-brutal btn-primary font-display">
-            <span>⚡ Launch Studio</span>
-          </a>
-          <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Toggle navigation">☰</button>
-        </div>
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">Xf</span>ExcelFlow</a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle nav"><span></span><span></span><span></span></button>
+      <nav id="main-nav">
+        <a href="index.html">Home</a>
+        <a href="info.html">How It Works</a>
+        <a href="tools.html">Tools</a>
+        <a href="maker.html" class="active">Dashboard Maker</a>
       </nav>
-    </div>
-
-    <!-- Mobile Drawer -->
-    <div class="mobile-drawer" id="mobileDrawer">
-      <a href="index.html" class="">🏠 Home Landing</a>
-      <a href="maker.html" class="active">⚡ Excel Maker Studio</a>
-      <a href="info.html" class="">📐 Tech Architecture &amp; Formulas</a>
-      <a href="tools.html" class="">🛠️ Data &amp; Spreadsheet Utilities</a>
-      <a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download>⬇ Download Sample .xlsx Workbook</a>
     </div>
   </header>
 
+  <section class="studio">
+    <div class="container">
+      <div class="studio-header">
+        <h1 class="font-display">📊 Dashboard Maker Studio</h1>
+        <p>Upload data + describe what you need → download a polished .xlsx dashboard</p>
+      </div>
 
-  <main class="container maker-wrap">
-    <div class="maker-header">
-      <div class="sticker sticker-ai" style="margin-bottom: 12px;">✨ Gemini 3.6 Flash Synthesis Engine</div>
-      <h1 class="maker-title font-display">Excel Maker Dashboard Studio</h1>
-      <p class="maker-desc">Ingest raw client data and specific business questions to compile an authentic Microsoft Excel dashboard with genuine dynamic formulas and slicers.</p>
-    </div>
-
-    <div class="console-card">
-      <!-- 1. File Upload Dropzone -->
-      <div>
-        <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 8px;">1. Client Dataset File (.xlsx, .csv)</div>
-        <div class="dropzone" id="dropzone">
-          <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
-          <div class="dropzone-icon">📂</div>
-          <div class="dropzone-title font-display">Drop client dataset here, or click to browse</div>
-          <div class="dropzone-sub">Supports Microsoft Excel (.xlsx, .xls) and CSV datasets up to 25MB</div>
-        </div>
-
-        <div class="file-banner" id="fileBanner">
-          <div class="file-left">
-            <div class="file-icon-badge">X</div>
-            <div class="file-details">
-              <span class="file-name" id="fileName">dataset.csv</span>
-              <span class="file-stats" id="fileMeta">Ready for analysis</span>
+      <div class="studio-grid">
+        <!-- LEFT PANEL: Inputs -->
+        <div>
+          <!-- Data Upload -->
+          <div class="panel" id="data-panel" style="margin-bottom:20px;">
+            <div class="panel-header">
+              <span style="font-size:1.1rem;">📂</span>
+              <h2>1. Upload Dataset</h2>
+              <span class="badge" style="background:var(--excel-light);" id="data-badge">Required</span>
+            </div>
+            <div class="panel-body">
+              <div class="drop-zone" id="data-drop">
+                <span class="drop-icon">📊</span>
+                <p>Drop your data file here</p>
+                <p class="drop-hint">.csv, .xlsx, .xls — up to 25MB</p>
+                <input type="file" accept=".csv,.xlsx,.xls" id="data-input" style="display:none;">
+              </div>
+              <div id="data-preview" style="display:none;"></div>
             </div>
           </div>
-          <button type="button" class="btn-remove-file" id="removeFileBtn" title="Remove file">✕</button>
-        </div>
-      </div>
 
-      <!-- 2. AI Question & Business Objective -->
-      <div class="question-card">
-        <div class="question-top">
-          <label class="question-lbl" for="clientQuestion">
-            <span>✨</span> <strong>2. Client Questions &amp; Analysis Objectives</strong>
-          </label>
-          <span class="sticker sticker-ai" style="font-size: 0.72rem;">AI Binds to Exact Columns</span>
-        </div>
-        <textarea id="clientQuestion" class="question-input" rows="3" placeholder="e.g., Create a sales executive dashboard comparing Revenue and Units across Regions, show monthly revenue trends, rank top products, and add slicers for Region and Month."></textarea>
+          <!-- Question / Assignment -->
+          <div class="panel" id="question-panel">
+            <div class="panel-header">
+              <span style="font-size:1.1rem;">💡</span>
+              <h2>2. Describe Your Dashboard</h2>
+              <span class="badge" style="background:var(--yellow-light);" id="q-badge">Optional</span>
+            </div>
+            <div class="panel-body">
+              <textarea class="question-area" id="question-input" placeholder="Example: Create a Sales Dashboard showing Revenue by Region, Revenue by Product, a monthly trend line chart, and KPIs for Total Revenue, Average Unit Price, and Total Units Sold. Add slicers for Region and Product."></textarea>
 
-        <div class="chips-row">
-          <span class="chips-label">Quick Prompts:</span>
-          <button type="button" class="q-chip" data-q="Compare total Revenue and Units across Regions, show monthly revenue trends, rank top products, and add slicers for Region and Month.">💼 Regional Sales &amp; Trend</button>
-          <button type="button" class="q-chip" data-q="Analyze Revenue, Cost, and Profit Margin across Product Categories, highlight top-performing departments, and add slicers.">📈 Profit &amp; Margin Breakdown</button>
-          <button type="button" class="q-chip" data-q="Show average salary and headcount by Department, analyze performance ratings, and filter by Department and Status.">👥 Headcount &amp; Compensation</button>
-          <button type="button" class="q-chip" data-q="Analyze inventory stock levels, warehouse fulfillment rates, and delivery performance over time.">📦 Supply Chain &amp; Inventory</button>
+              <div class="q-file-row">
+                <button class="q-file-btn" id="q-file-btn">📎 Attach assignment file</button>
+                <span class="q-file-name" id="q-file-name"></span>
+                <input type="file" accept=".pdf,.docx,.txt,.png,.jpg,.jpeg,.webp" id="q-file-input" style="display:none;">
+              </div>
+
+              <div>
+                <p class="examples-label">Quick examples:</p>
+                <div class="examples-row">
+                  <span class="example-chip" data-q="Create a Sales Dashboard with Revenue by Region, Revenue by Product, monthly trend, and KPIs for Total Revenue, Average Price, and Total Records. Add slicers for Region and Product.">Sales Dashboard</span>
+                  <span class="example-chip" data-q="Analyze employee data: Average Salary by Department, headcount by location, performance rating distribution, and top earners.">Employee Analysis</span>
+                  <span class="example-chip" data-q="Financial Analysis: Monthly Revenue Trend, Profit Margin by Product, Cost vs Revenue comparison, and quarterly summary.">Financial Report</span>
+                  <span class="example-chip" data-q="Create a comprehensive executive dashboard that best represents this dataset with the most insightful KPIs, analyses, and charts.">Auto-Detect Best</span>
+                </div>
+              </div>
+
+              <label style="font-size:0.8rem;font-weight:700;color:var(--muted);">Dashboard title (optional)</label>
+              <input type="text" class="title-input" id="title-input" placeholder="Executive Performance Dashboard">
+            </div>
+          </div>
         </div>
 
-        <div style="margin-top: 14px; display: flex; align-items: center; gap: 12px; border-top: 2px dashed var(--ink); padding-top: 12px; flex-wrap: wrap;">
-          <label for="qFileInput" class="btn-brutal btn-secondary" style="cursor: pointer; font-size: 0.82rem; padding: 6px 14px;">
-            <span>📎 Attach Question Doc (.pdf, .docx, .txt, img)</span>
-            <input type="file" id="qFileInput" accept=".pdf,.docx,.txt,.png,.jpg,.jpeg,.webp" style="display: none;" />
-          </label>
-          <div id="qFileBadge" style="display: none; align-items: center; gap: 8px; font-size: 0.82rem; background: #FFFFFF; border: 2px solid var(--ink); padding: 5px 12px; border-radius: var(--radius-sm); font-weight: 700; box-shadow: 2px 2px 0px var(--ink);">
-            <span id="qFileNameText">question.pdf</span>
-            <button type="button" id="removeQFileBtn" style="border: none; background: none; cursor: pointer; color: var(--coral); font-weight: 900;">✕</button>
+        <!-- RIGHT PANEL: Generate & Results -->
+        <div>
+          <div class="panel">
+            <div class="panel-header">
+              <span style="font-size:1.1rem;">⚡</span>
+              <h2>3. Generate</h2>
+            </div>
+            <div class="panel-body">
+              <button class="btn-generate" id="btn-generate" disabled>
+                <span>🚀</span> Generate Excel Dashboard
+              </button>
+
+              <!-- Progress -->
+              <div class="progress-panel" id="progress-panel">
+                <div class="progress-bar-outer"><div class="progress-bar-inner" id="progress-bar"></div></div>
+                <p class="progress-step" id="progress-step">Initializing...</p>
+                <div class="progress-log" id="progress-log"></div>
+              </div>
+
+              <!-- Result -->
+              <div class="result-panel" id="result-panel">
+                <div class="result-card">
+                  <h3>✅ Dashboard Generated Successfully</h3>
+                  <div class="result-stats" id="result-stats"></div>
+                  <a class="btn-download" id="btn-download" href="#" download>
+                    <span>📥</span> Download .xlsx
+                  </a>
+                  <p style="margin-top:12px;font-size:0.8rem;color:var(--muted);" id="ai-summary"></p>
+                </div>
+              </div>
+
+              <!-- Error -->
+              <div class="error-panel" id="error-panel">
+                <div class="error-card">
+                  <h3>⚠️ Generation Failed</h3>
+                  <p id="error-msg"></p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      <!-- 3. Sample Datasets -->
-      <div class="samples-wrap">
-        <span class="samples-title">Or test with verified sample datasets:</span>
-        <div class="sample-btn-group">
-          <button type="button" class="btn-sample" id="sampleSalesBtn">
-            <span>💼</span> Regional Sales (48 records)
-          </button>
-          <button type="button" class="btn-sample" id="sampleFinanceBtn">
-            <span>📈</span> Budget &amp; Spend (120 records)
-          </button>
-          <button type="button" class="btn-sample" id="sampleOpsBtn">
-            <span>📦</span> Logistics &amp; Freight (80 records)
-          </button>
-        </div>
-      </div>
-
-      <!-- 4. Title Input -->
-      <div class="title-field-wrap">
-        <label style="font-weight: 800; font-size: 0.92rem;" for="dashboardTitle">Dashboard Title (Optional)</label>
-        <input type="text" id="dashboardTitle" class="title-input" placeholder="e.g., Executive Q3 Regional Sales &amp; Margin Performance" />
-      </div>
-
-      <!-- Execute Button -->
-      <button type="button" class="btn-execute font-display" id="buildBtn">
-        <span>⚡ Build Executive Excel Dashboard</span>
-      </button>
-
-      <!-- Stepper Panel -->
-      <div class="stepper-panel" id="progressPanel">
-        <div class="stepper-header">
-          <span id="progressTitle">Compiling Executive Workbook...</span>
-          <span class="font-mono" id="progressPct">0%</span>
-        </div>
-        <div class="step-list">
-          <div class="step-node" id="step1">
-            <div class="step-num">1</div>
-            <span>Ingesting client dataset schema &amp; data types...</span>
-          </div>
-          <div class="step-node" id="step2">
-            <div class="step-num">2</div>
-            <span>Gemini AI deeply analyzing dataset &amp; business questions...</span>
-          </div>
-          <div class="step-node" id="step3">
-            <div class="step-num">3</div>
-            <span>Architecting tailored KPIs, multi-table breakdowns &amp; charts...</span>
-          </div>
-          <div class="step-node" id="step4">
-            <div class="step-num">4</div>
-            <span>Compiling dynamic formulas (=SUMIFS, =AVERAGEIFS) &amp; OpenXML cache...</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Success Card -->
-      <div class="success-card" id="downloadCard">
-        <div class="success-badge">✓ Executive Excel Workbook Ready!</div>
-        
-        <div class="ai-briefing-box" id="aiBriefingBox">
-          <div style="font-weight: 900; font-size: 0.8rem; text-transform: uppercase; color: var(--excel); margin-bottom: 4px;">AI Analysis Briefing:</div>
-          <div id="downloadDesc">100% genuine dashboard compiled from your data.</div>
-        </div>
-
-        <div class="result-metrics-grid">
-          <div class="metric-cell">
-            <div class="metric-lbl">Active Sheet</div>
-            <div class="metric-val" id="resSheet">01_Executive</div>
-          </div>
-          <div class="metric-cell">
-            <div class="metric-lbl">Dynamic Formulas</div>
-            <div class="metric-val" id="resFormulas">100% Real</div>
-          </div>
-          <div class="metric-cell">
-            <div class="metric-lbl">Engine</div>
-            <div class="metric-val" id="resMetric">Gemini 3.6 Flash</div>
-          </div>
-          <div class="metric-cell">
-            <div class="metric-lbl">Client Records</div>
-            <div class="metric-val" id="resRecords">Formatted</div>
-          </div>
-        </div>
-
-        <button type="button" class="btn-download-now font-display" id="downloadFinalBtn">
-          <span>⬇ Download .xlsx Dashboard</span>
-        </button>
-      </div>
-
     </div>
-  </main>
+  </section>
 
-  
   <footer>
-    <div class="container footer-content">
-      <div class="sticker sticker-excel">Institutional Spreadsheet Engine</div>
-      <ul class="footer-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="maker.html">Excel Maker Studio</a></li>
-        <li><a href="info.html">Technical Architecture</a></li>
-        <li><a href="tools.html">Data Utilities</a></li>
-        <li><a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download>Sample .xlsx</a></li>
-      </ul>
-      <div class="footer-bottom">
-        <strong>ExcelFlow Platform</strong> • 100% Dynamic Formulas • Real Slicers &amp; OpenXML Cache • Zero Hallucination Guarantee
+    <div class="container footer-inner">
+      <span class="footer-copy">&copy; 2026 ExcelFlow</span>
+      <div style="display:flex;gap:24px;">
+        <a href="index.html">Home</a>
+        <a href="info.html">Info</a>
+        <a href="tools.html">Tools</a>
       </div>
     </div>
   </footer>
-  <script>
-    const mobileBtn = document.getElementById('mobileMenuBtn');
-    const mobileDrawer = document.getElementById('mobileDrawer');
-    if (mobileBtn && mobileDrawer) {
-      mobileBtn.addEventListener('click', () => {
-        mobileDrawer.classList.toggle('open');
-      });
-    }
-  </script>
-
 
   <script>
-    (function() {
-      let parsedHeaders = [];
-      let parsedRows = [];
-      let currentFile = null;
-      let currentQuestionFile = null;
-      let generatedWorkbookBlob = null;
-      let outputFilename = "Executive_Dashboard.xlsx";
+    const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:8000'
+      : '';
 
-      const fileInput = document.getElementById('fileInput');
-      const dropzone = document.getElementById('dropzone');
-      const fileBanner = document.getElementById('fileBanner');
-      const fileName = document.getElementById('fileName');
-      const fileMeta = document.getElementById('fileMeta');
-      const removeFileBtn = document.getElementById('removeFileBtn');
+    // Mobile nav
+    document.getElementById('nav-toggle').addEventListener('click', () => {
+      document.getElementById('main-nav').classList.toggle('open');
+    });
 
-      const sampleSalesBtn = document.getElementById('sampleSalesBtn');
-      const sampleFinanceBtn = document.getElementById('sampleFinanceBtn');
-      const sampleOpsBtn = document.getElementById('sampleOpsBtn');
+    // State
+    let dataFile = null;
+    let questionFile = null;
 
-      const clientQuestion = document.getElementById('clientQuestion');
-      const qFileInput = document.getElementById('qFileInput');
-      const qFileBadge = document.getElementById('qFileBadge');
-      const qFileNameText = document.getElementById('qFileNameText');
-      const removeQFileBtn = document.getElementById('removeQFileBtn');
+    // ─── Data Upload ───
+    const dataDrop = document.getElementById('data-drop');
+    const dataInput = document.getElementById('data-input');
+    const dataPreview = document.getElementById('data-preview');
+    const dataBadge = document.getElementById('data-badge');
+    const btnGenerate = document.getElementById('btn-generate');
 
-      const dashboardTitle = document.getElementById('dashboardTitle');
-      const buildBtn = document.getElementById('buildBtn');
-      const progressPanel = document.getElementById('progressPanel');
-      const progressTitle = document.getElementById('progressTitle');
-      const progressPct = document.getElementById('progressPct');
-
-      const step1 = document.getElementById('step1');
-      const step2 = document.getElementById('step2');
-      const step3 = document.getElementById('step3');
-      const step4 = document.getElementById('step4');
-
-      const downloadCard = document.getElementById('downloadCard');
-      const downloadFinalBtn = document.getElementById('downloadFinalBtn');
-      const resSheet = document.getElementById('resSheet');
-      const resFormulas = document.getElementById('resFormulas');
-      const resMetric = document.getElementById('resMetric');
-      const resRecords = document.getElementById('resRecords');
-      const downloadDesc = document.getElementById('downloadDesc');
-
-      function getColLetter(colIdx) {
-        let letter = "";
-        let temp = colIdx + 1;
-        while (temp > 0) {
-          let mod = (temp - 1) % 26;
-          letter = String.fromCharCode(65 + mod) + letter;
-          temp = Math.floor((temp - mod) / 26);
-        }
-        return letter;
+    function handleDataFile(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (!['csv', 'xlsx', 'xls'].includes(ext)) {
+        alert('Unsupported format. Use .csv, .xlsx, or .xls');
+        return;
+      }
+      if (file.size > 25 * 1024 * 1024) {
+        alert('File too large. Maximum 25MB.');
+        return;
       }
 
-      // Drag and drop handlers
-      ['dragenter', 'dragover'].forEach(name => {
-        dropzone.addEventListener(name, (e) => {
-          e.preventDefault();
-          dropzone.classList.add('drag-over');
-        });
-      });
+      dataFile = file;
+      dataDrop.classList.add('loaded');
+      dataDrop.innerHTML = `
+        <span class="drop-icon">✅</span>
+        <p>${file.name}</p>
+        <p class="drop-hint">${(file.size / 1024).toFixed(1)} KB • Click to change</p>
+      `;
+      dataBadge.textContent = 'Ready';
+      dataBadge.style.background = 'var(--excel-light)';
+      btnGenerate.disabled = false;
 
-      ['dragleave', 'drop'].forEach(name => {
-        dropzone.addEventListener(name, (e) => {
-          e.preventDefault();
-          dropzone.classList.remove('drag-over');
-        });
-      });
-
-      dropzone.addEventListener('drop', (e) => {
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-          handleFile(e.dataTransfer.files[0]);
-        }
-      });
-
-      fileInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files.length > 0) {
-          handleFile(e.target.files[0]);
-        }
-      });
-
-      function handleFile(file) {
-        currentFile = file;
-        fileName.textContent = file.name;
-        fileMeta.textContent = `${Math.round(file.size / 1024)} KB • Parsing client data...`;
-        fileBanner.style.display = 'flex';
-        dropzone.style.display = 'none';
-        downloadCard.style.display = 'none';
-        [sampleSalesBtn, sampleFinanceBtn, sampleOpsBtn].forEach(b => b.classList.remove('active'));
-
-        const cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
-        if (!dashboardTitle.value) {
-          dashboardTitle.value = "Executive " + cleanName.charAt(0).toUpperCase() + cleanName.slice(1) + " Dashboard";
-        }
-
+      // Preview (for CSV)
+      if (ext === 'csv') {
         const reader = new FileReader();
-        reader.onload = function(e) {
-          try {
-            const data = new Uint8Array(e.target.result);
-            const wbIn = XLSX.read(data, {type: 'array', cellDates: true});
-            const firstSheet = wbIn.Sheets[wbIn.SheetNames[0]];
-            const raw = XLSX.utils.sheet_to_json(firstSheet, {header: 1, defval: ""});
+        reader.onload = e => {
+          const lines = e.target.result.split('\n').filter(l => l.trim());
+          if (lines.length < 2) return;
+          const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+          const rows = lines.slice(1, 6).map(l => l.split(',').map(c => c.trim().replace(/^"|"$/g, '')));
 
-            if (!raw || raw.length < 2) {
-              fileMeta.textContent = "Error: File must contain at least 1 header row and 1 data row.";
-              return;
-            }
-
-            parsedHeaders = raw[0].map(h => String(h).trim());
-            parsedRows = raw.slice(1).filter(r => r.some(c => c !== "" && c !== null && c !== undefined));
-            fileMeta.textContent = `${parsedRows.length} records • ${parsedHeaders.length} columns • Ready`;
-          } catch (err) {
-            fileMeta.textContent = "Error parsing file: " + err.message;
-          }
+          let html = `<div class="data-info">
+            <span>Rows: ~${lines.length - 1}</span>
+            <span>Columns: ${headers.length}</span>
+          </div>
+          <div class="preview-scroll"><table class="preview-table"><thead><tr>`;
+          headers.forEach(h => html += `<th>${h}</th>`);
+          html += '</tr></thead><tbody>';
+          rows.forEach(r => {
+            html += '<tr>';
+            r.forEach(c => html += `<td>${c}</td>`);
+            html += '</tr>';
+          });
+          html += '</tbody></table></div>';
+          dataPreview.innerHTML = html;
+          dataPreview.style.display = 'block';
         };
-        reader.readAsArrayBuffer(file);
+        reader.readAsText(file);
+      } else {
+        dataPreview.innerHTML = `<div class="data-info"><span>Format: .${ext}</span><span>Size: ${(file.size/1024).toFixed(1)} KB</span></div>`;
+        dataPreview.style.display = 'block';
       }
+    }
 
-      removeFileBtn.addEventListener('click', () => {
-        currentFile = null;
-        parsedHeaders = [];
-        parsedRows = [];
-        fileInput.value = '';
-        fileBanner.style.display = 'none';
-        dropzone.style.display = 'block';
-        downloadCard.style.display = 'none';
+    dataDrop.addEventListener('click', () => dataInput.click());
+    dataDrop.addEventListener('dragover', e => { e.preventDefault(); dataDrop.classList.add('drag-over'); });
+    dataDrop.addEventListener('dragleave', () => dataDrop.classList.remove('drag-over'));
+    dataDrop.addEventListener('drop', e => {
+      e.preventDefault(); dataDrop.classList.remove('drag-over');
+      if (e.dataTransfer.files.length) handleDataFile(e.dataTransfer.files[0]);
+    });
+    dataInput.addEventListener('change', () => { if (dataInput.files.length) handleDataFile(dataInput.files[0]); });
+
+    // ─── Question File ───
+    const qFileBtn = document.getElementById('q-file-btn');
+    const qFileInput = document.getElementById('q-file-input');
+    const qFileName = document.getElementById('q-file-name');
+
+    qFileBtn.addEventListener('click', () => qFileInput.click());
+    qFileInput.addEventListener('change', () => {
+      if (qFileInput.files.length) {
+        questionFile = qFileInput.files[0];
+        qFileName.textContent = questionFile.name;
+      }
+    });
+
+    // ─── Example Questions ───
+    document.querySelectorAll('.example-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.getElementById('question-input').value = chip.dataset.q;
       });
+    });
 
-      // Question Chips
-      document.querySelectorAll('.q-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          clientQuestion.value = chip.getAttribute('data-q');
-          clientQuestion.focus();
-        });
-      });
+    // ─── Generate Dashboard ───
+    btnGenerate.addEventListener('click', async () => {
+      if (!dataFile) return;
 
-      if (qFileInput) {
-        qFileInput.addEventListener('change', (e) => {
-          if (e.target.files && e.target.files.length > 0) {
-            currentQuestionFile = e.target.files[0];
-            qFileNameText.textContent = currentQuestionFile.name;
-            qFileBadge.style.display = 'inline-flex';
-          }
-        });
+      const question = document.getElementById('question-input').value.trim();
+      const title = document.getElementById('title-input').value.trim();
+
+      // Show progress
+      const progressPanel = document.getElementById('progress-panel');
+      const resultPanel = document.getElementById('result-panel');
+      const errorPanel = document.getElementById('error-panel');
+      const progressBar = document.getElementById('progress-bar');
+      const progressStep = document.getElementById('progress-step');
+      const progressLog = document.getElementById('progress-log');
+
+      progressPanel.classList.add('show');
+      resultPanel.classList.remove('show');
+      errorPanel.classList.remove('show');
+      btnGenerate.disabled = true;
+      btnGenerate.classList.add('loading');
+      btnGenerate.innerHTML = '<span>⏳</span> Generating...';
+      progressLog.innerHTML = '';
+      progressBar.style.width = '0%';
+
+      function log(msg, type = 'info') {
+        const cls = type === 'ok' ? 'log-ok' : type === 'err' ? 'log-err' : 'log-info';
+        progressLog.innerHTML += `<div class="log-entry"><span class="${cls}">[${new Date().toLocaleTimeString()}]</span> ${msg}</div>`;
+        progressLog.scrollTop = progressLog.scrollHeight;
       }
 
-      if (removeQFileBtn) {
-        removeQFileBtn.addEventListener('click', () => {
-          currentQuestionFile = null;
-          if (qFileInput) qFileInput.value = '';
-          qFileBadge.style.display = 'none';
-        });
-      }
+      // Simulate progress stages
+      const stages = [
+        { pct: 15, step: 'Uploading dataset...', msg: 'Sending file to server' },
+        { pct: 35, step: 'Profiling columns...', msg: 'Analyzing data types and distributions' },
+        { pct: 55, step: 'AI planning dashboard...', msg: 'Generating KPIs, analyses, and chart specs' },
+        { pct: 75, step: 'Building workbook...', msg: 'Writing formulas, tables, and charts' },
+        { pct: 90, step: 'Validating output...', msg: 'Checking zero-hallucination compliance' },
+      ];
 
-      // Samples
-      sampleSalesBtn.addEventListener('click', () => {
-        dashboardTitle.value = "Executive Regional Sales Dashboard";
-        clientQuestion.value = "Compare revenue and units across Regions, highlight top products, and add slicers for Region.";
-        parsedHeaders = ["Order_ID", "Date", "Region", "Sales_Rep", "Product", "Units_Sold", "Unit_Price", "Revenue"];
-        parsedRows = [
-          [1001, "2026-01-05", "North", "David Miller", "Laptop Pro X", 24, 1200, 28800],
-          [1002, "2026-01-08", "South", "Emma Watson", "4K Ultra Monitor", 18, 450, 8100],
-          [1003, "2026-01-12", "East", "Michael Chang", "Cloud Storage Hub", 35, 300, 10500],
-          [1004, "2026-01-15", "West", "Sarah Jenkins", "Ergonomic Keypad", 50, 120, 6000],
-          [1005, "2026-01-20", "North", "David Miller", "4K Ultra Monitor", 22, 450, 9900],
-          [1006, "2026-01-25", "South", "Emma Watson", "Laptop Pro X", 30, 1200, 36000],
-          [1007, "2026-02-02", "East", "Michael Chang", "Laptop Pro X", 15, 1200, 18000],
-          [1008, "2026-02-07", "West", "Sarah Jenkins", "Cloud Storage Hub", 42, 300, 12600]
-        ];
-        activateSample(sampleSalesBtn, "Regional Sales Sample (8 records)", "8 columns • Total Rev: $129,900");
-      });
-
-      sampleFinanceBtn.addEventListener('click', () => {
-        dashboardTitle.value = "Corporate Financial Spend & Budget Variance";
-        clientQuestion.value = "Analyze Budget vs Actual Spend across Departments, show Variance, and filter by Department.";
-        parsedHeaders = ["Dept_Code", "Department", "Quarter", "Budget", "Actual_Spend", "Variance", "Approval_Status"];
-        parsedRows = [
-          ["ENG", "Engineering", "Q1", 450000, 420000, 30000, "Approved"],
-          ["MKT", "Marketing", "Q1", 280000, 310000, -30000, "Flagged"],
-          ["OPS", "Operations", "Q1", 350000, 340000, 10000, "Approved"],
-          ["SAL", "Sales", "Q1", 520000, 490000, 30000, "Approved"],
-          ["HR", "Human Resources", "Q1", 120000, 115000, 5000, "Approved"],
-          ["ENG", "Engineering", "Q2", 480000, 475000, 5000, "Approved"],
-          ["MKT", "Marketing", "Q2", 300000, 290000, 10000, "Approved"],
-          ["SAL", "Sales", "Q2", 550000, 560000, -10000, "Review"]
-        ];
-        activateSample(sampleFinanceBtn, "Financial Budget Sample (8 records)", "7 columns • Total Spend: $3.0M");
-      });
-
-      sampleOpsBtn.addEventListener('click', () => {
-        dashboardTitle.value = "Logistics & Fulfillment Performance";
-        clientQuestion.value = "Analyze freight cost and shipping weight across Carriers and Origins with carrier slicers.";
-        parsedHeaders = ["Shipment_ID", "Origin", "Destination", "Carrier", "Weight_Kg", "Cost", "Delivery_Days"];
-        parsedRows = [
-          ["SHP-801", "Chicago", "Dallas", "FedEx", 450, 1850, 2],
-          ["SHP-802", "Atlanta", "New York", "UPS", 780, 2400, 3],
-          ["SHP-803", "Los Angeles", "Seattle", "DHL", 320, 1400, 1],
-          ["SHP-804", "Dallas", "Miami", "FedEx", 610, 2100, 2],
-          ["SHP-805", "New York", "Boston", "UPS", 240, 950, 1],
-          ["SHP-806", "Seattle", "Denver", "FedEx", 550, 1900, 2]
-        ];
-        activateSample(sampleOpsBtn, "Logistics Sample (6 records)", "7 columns • Total Cost: $10,600");
-      });
-
-      function activateSample(btn, name, meta) {
-        currentFile = null;
-        [sampleSalesBtn, sampleFinanceBtn, sampleOpsBtn].forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        fileName.textContent = name;
-        fileMeta.textContent = meta;
-        fileBanner.style.display = 'flex';
-        dropzone.style.display = 'none';
-        downloadCard.style.display = 'none';
-      }
-
-      function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-      function setStep(num, text, pct) {
-        progressTitle.textContent = text;
-        progressPct.textContent = pct + "%";
-        [step1, step2, step3, step4].forEach((s, idx) => {
-          s.classList.remove('active', 'done');
-          if (idx + 1 < num) s.classList.add('done');
-          if (idx + 1 === num) s.classList.add('active');
-        });
-      }
-
-      function showSuccess() {
-        progressPanel.style.display = 'none';
-        downloadCard.style.display = 'flex';
-        buildBtn.disabled = false;
-        downloadCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-
-      // Build execution
-      buildBtn.addEventListener('click', async () => {
-        if (parsedHeaders.length === 0 || parsedRows.length === 0) {
-          alert("Please upload a client data file or select one of the verified sample datasets first.");
-          return;
+      let stageIdx = 0;
+      const stageInterval = setInterval(() => {
+        if (stageIdx < stages.length) {
+          const s = stages[stageIdx];
+          progressBar.style.width = s.pct + '%';
+          progressStep.textContent = s.step;
+          log(s.msg, 'info');
+          stageIdx++;
         }
+      }, 1200);
 
-        buildBtn.disabled = true;
-        progressPanel.style.display = 'block';
-        downloadCard.style.display = 'none';
+      try {
+        const formData = new FormData();
+        formData.append('file', dataFile);
+        if (question) formData.append('question', question);
+        if (title) formData.append('title', title);
+        if (questionFile) formData.append('question_file', questionFile);
 
-        setStep(1, "Ingesting client dataset schema & data types...", 25);
-        await sleep(350);
-
-        let uploadFile = currentFile;
-        if (!uploadFile && parsedRows.length > 0) {
-          const csvLines = [parsedHeaders.join(",")];
-          parsedRows.forEach(r => csvLines.push(r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")));
-          const csvBlob = new Blob([csvLines.join("\n")], { type: "text/csv" });
-          const safeTitle = (dashboardTitle.value || "Dataset").trim().replace(/\s+/g, "_");
-          uploadFile = new File([csvBlob], `${safeTitle}.csv`, { type: "text/csv" });
-        }
-
-        if (uploadFile) {
-          try {
-            setStep(2, "Gemini AI deeply analyzing dataset & business questions...", 50);
-            const formData = new FormData();
-            formData.append('file', uploadFile);
-            if (dashboardTitle.value) formData.append('title', dashboardTitle.value);
-            if (clientQuestion && clientQuestion.value.trim()) formData.append('question', clientQuestion.value.trim());
-            if (currentQuestionFile) formData.append('question_file', currentQuestionFile);
-
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 45000);
-
-            const urls = ['/api/dashboard/generate-from-data', 'http://localhost:8000/api/dashboard/generate-from-data'];
-            for (let url of urls) {
-              try {
-                const res = await fetch(url, {
-                  method: 'POST',
-                  body: formData,
-                  signal: controller.signal
-                });
-                if (res.ok) {
-                  const data = await res.json();
-                  clearTimeout(timeoutId);
-                  setStep(3, `AI architected ${data.kpis_created || 4} KPIs & breakdown tables...`, 75);
-                  await sleep(400);
-                  setStep(4, `Compiled ${data.formula_count || 16} dynamic formulas with OpenXML cache...`, 100);
-                  await sleep(300);
-
-                  outputFilename = data.filename || "Client_Executive_Dashboard.xlsx";
-                  generatedWorkbookBlob = null;
-                  window._backendDownloadUrl = data.download_url;
-
-                  resSheet.textContent = "01_Executive_Dashboard";
-                  resFormulas.textContent = `${data.formula_count || 16} Real Dynamic`;
-                  resMetric.textContent = data.ai_used ? "Gemini 3.6 Flash" : "NLP Architect";
-                  resRecords.textContent = `${data.row_count || parsedRows.length} Records`;
-                  downloadDesc.textContent = data.ai_summary || `Tailored executive dashboard compiled directly from ${uploadFile.name} answering your business questions.`;
-
-                  showSuccess();
-                  return;
-                }
-              } catch (e) {}
-            }
-            clearTimeout(timeoutId);
-          } catch (err) {}
-        }
-
-        // Offline Client Fallback
-        setStep(2, "Analyzing client measures & business question keywords...", 50);
-        await sleep(350);
-
-        setStep(3, "Structuring Executive Dashboard with real SUM & SUMIFS formulas...", 75);
-        await sleep(400);
-
-        setStep(4, "Finalizing OpenXML workbook from client data...", 100);
-        await sleep(300);
-
-        compileClientWorkbook();
-      });
-
-      function compileClientWorkbook() {
-        const title = dashboardTitle.value.trim() || "Executive Performance Dashboard";
-        const numRows = parsedRows.length;
-        const qText = (clientQuestion ? clientQuestion.value : "").toLowerCase();
-
-        const colProfiles = parsedHeaders.map((header, colIdx) => {
-          let numCount = 0;
-          let sum = 0;
-          const vals = [];
-          parsedRows.forEach(r => {
-            const v = r[colIdx];
-            if (v !== "" && v !== null && !isNaN(Number(v))) {
-              numCount++;
-              sum += Number(v);
-            }
-            if (v !== "" && v !== null && v !== undefined) vals.push(String(v));
-          });
-          const isNum = numCount >= numRows * 0.6;
-          return {
-            index: colIdx,
-            name: header,
-            isNum,
-            sum,
-            uniques: Array.from(new Set(vals)).slice(0, 20),
-            uniqueCount: new Set(vals).size
-          };
+        log('Sending request to API...', 'info');
+        const resp = await fetch(`${API}/api/dashboard/generate-from-data`, {
+          method: 'POST',
+          body: formData,
         });
 
-        const measures = colProfiles.filter(c => c.isNum);
-        function measureScore(m) {
-          const l = m.name.toLowerCase();
-          let score = 0;
-          if (qText.includes(l)) score += 100;
-          if (l.includes("revenue") || l.includes("sales") || l.includes("amount")) score += 10;
-          if (l.includes("profit") || l.includes("variance")) score += 9;
-          if (l.includes("cost") || l.includes("price")) score += 8;
-          return score;
+        clearInterval(stageInterval);
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ detail: 'Unknown error' }));
+          throw new Error(err.detail || `HTTP ${resp.status}`);
         }
-        measures.sort((a, b) => measureScore(b) - measureScore(a));
 
-        const primaryMeasure = measures[0] || { index: parsedHeaders.length - 1, name: parsedHeaders[parsedHeaders.length - 1], sum: 0 };
-        const secondaryMeasure = measures[1] || null;
+        const data = await resp.json();
 
-        const dimensions = colProfiles.filter(c => !c.isNum || c.uniqueCount <= 12);
-        function dimScore(d) {
-          const l = d.name.toLowerCase();
-          let score = 0;
-          if (qText.includes(l)) score += 100;
-          if (l.includes("region") || l.includes("territory")) score += 10;
-          if (l.includes("department") || l.includes("category")) score += 9;
-          if (l.includes("product") || l.includes("item")) score += 8;
-          return score;
-        }
-        dimensions.sort((a, b) => dimScore(b) - dimScore(a));
+        progressBar.style.width = '100%';
+        progressStep.textContent = 'Complete!';
+        log('Dashboard generated successfully!', 'ok');
 
-        const primaryDim = dimensions[0] || { index: 0, name: parsedHeaders[0], uniques: ["Total"] };
+        // Show result
+        const resultStats = document.getElementById('result-stats');
+        resultStats.innerHTML = `
+          <div class="result-stat"><span class="val">${data.row_count || 0}</span><span class="label">Rows</span></div>
+          <div class="result-stat"><span class="val">${data.formula_count || 0}</span><span class="label">Formulas</span></div>
+          <div class="result-stat"><span class="val">${data.chart_count || 0}</span><span class="label">Charts</span></div>
+          <div class="result-stat"><span class="val">${data.kpis_created || 0}</span><span class="label">KPIs</span></div>
+          <div class="result-stat"><span class="val">${data.analyses_created || 0}</span><span class="label">Analyses</span></div>
+          <div class="result-stat"><span class="val">${data.sheets ? data.sheets.length : 0}</span><span class="label">Sheets</span></div>
+        `;
 
-        const wbOut = XLSX.utils.book_new();
+        const downloadBtn = document.getElementById('btn-download');
+        downloadBtn.href = `${API}${data.download_url}`;
+        downloadBtn.download = data.filename || 'dashboard.xlsx';
 
-        // 1. Executive_Dashboard Worksheet
-        const dashAOA = [];
-        dashAOA.push([title.toUpperCase()]);
-        dashAOA.push([]);
+        const aiSummary = document.getElementById('ai-summary');
+        aiSummary.textContent = data.ai_summary ? `AI: ${data.ai_summary}` : '';
 
-        const kpiLabels = [
-          "TOTAL " + primaryMeasure.name.toUpperCase(),
-          secondaryMeasure ? "TOTAL " + secondaryMeasure.name.toUpperCase() : "AVERAGE " + primaryMeasure.name.toUpperCase(),
-          "AVERAGE " + primaryMeasure.name.toUpperCase(),
-          "TOTAL RECORDS"
-        ];
-        dashAOA.push(kpiLabels);
+        resultPanel.classList.add('show');
 
-        const pColLetter = getColLetter(primaryMeasure.index);
-        const lastDataRow = numRows + 1;
-        const avgVal = numRows > 0 ? (primaryMeasure.sum / numRows) : 0;
-        const isCurrency = ["revenue", "sales", "cost", "price", "amount", "budget", "spend", "profit"].some(kw => primaryMeasure.name.toLowerCase().includes(kw));
-        const currFmt = isCurrency ? "$#,##0" : "#,##0";
+      } catch (err) {
+        clearInterval(stageInterval);
+        progressBar.style.width = '100%';
+        progressBar.style.background = 'var(--coral)';
+        progressStep.textContent = 'Failed';
+        log(`Error: ${err.message}`, 'err');
 
-        const kpiValues = [
-          { f: `SUM(Raw_Data!${pColLetter}2:${pColLetter}${lastDataRow})`, v: primaryMeasure.sum, z: currFmt },
-          secondaryMeasure
-            ? { f: `SUM(Raw_Data!${getColLetter(secondaryMeasure.index)}2:${getColLetter(secondaryMeasure.index)}${lastDataRow})`, v: secondaryMeasure.sum, z: "#,##0" }
-            : { f: `AVERAGE(Raw_Data!${pColLetter}2:${pColLetter}${lastDataRow})`, v: avgVal, z: currFmt },
-          { f: `AVERAGE(Raw_Data!${pColLetter}2:${pColLetter}${lastDataRow})`, v: avgVal, z: currFmt },
-          { f: `COUNTA(Raw_Data!A2:A${lastDataRow})`, v: numRows, z: "#,##0" }
-        ];
-        dashAOA.push(kpiValues);
-        dashAOA.push([]);
-        dashAOA.push([]);
-
-        dashAOA.push([`EXECUTIVE BREAKDOWN BY ${primaryDim.name.toUpperCase()}`, primaryMeasure.name.toUpperCase(), "SHARE %"]);
-        const tblStartRow = dashAOA.length + 1;
-        const dimColLetter = getColLetter(primaryDim.index);
-
-        primaryDim.uniques.forEach(cat => {
-          const sumFormula = `SUMIFS(Raw_Data!${pColLetter}2:${pColLetter}${lastDataRow}, Raw_Data!${dimColLetter}2:${dimColLetter}${lastDataRow}, "${cat}")`;
-          let catSum = 0;
-          parsedRows.forEach(r => {
-            if (String(r[primaryDim.index]) === String(cat)) {
-              const val = Number(r[primaryMeasure.index]);
-              if (!isNaN(val)) catSum += val;
-            }
-          });
-          dashAOA.push([
-            cat,
-            { f: sumFormula, v: catSum, z: currFmt },
-            { f: `B${dashAOA.length + 1}/$B$${tblStartRow + primaryDim.uniques.length}`, v: (primaryMeasure.sum > 0 ? catSum / primaryMeasure.sum : 0), z: "0.0%" }
-          ]);
-        });
-
-        const totRowIdx = tblStartRow + primaryDim.uniques.length;
-        dashAOA.push([
-          "GRAND TOTAL",
-          { f: `SUM(B${tblStartRow}:B${totRowIdx - 1})`, v: primaryMeasure.sum, z: currFmt },
-          { f: `SUM(C${tblStartRow}:C${totRowIdx - 1})`, v: 1.0, z: "0.0%" }
-        ]);
-
-        const wsDash = XLSX.utils.aoa_to_sheet(dashAOA);
-        wsDash['!cols'] = [{ wch: 32 }, { wch: 22 }, { wch: 18 }, { wch: 18 }];
-        XLSX.utils.book_append_sheet(wbOut, wsDash, "01_Executive_Dashboard");
-
-        // 2. Raw_Data Worksheet
-        const rawDataAOA = [parsedHeaders];
-        parsedRows.forEach(r => rawDataAOA.push(r));
-        const wsRaw = XLSX.utils.aoa_to_sheet(rawDataAOA);
-        XLSX.utils.book_append_sheet(wbOut, wsRaw, "02_Client_Data");
-
-        const wbArray = XLSX.write(wbOut, { bookType: 'xlsx', type: 'array' });
-        generatedWorkbookBlob = new Blob([wbArray], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-        outputFilename = `${title.replace(/[^a-zA-Z0-9_-]/g, "_")}.xlsx`;
-        window._backendDownloadUrl = null;
-
-        resSheet.textContent = "01_Executive_Dashboard";
-        resFormulas.textContent = `${primaryDim.uniques.length + 5} Dynamic`;
-        resMetric.textContent = "NLP Fallback Engine";
-        resRecords.textContent = `${numRows} Records`;
-        downloadDesc.textContent = `Executive workbook compiled with dynamic structured formulas for ${title}.`;
-
-        showSuccess();
+        document.getElementById('error-msg').textContent = err.message;
+        errorPanel.classList.add('show');
+      } finally {
+        btnGenerate.disabled = false;
+        btnGenerate.classList.remove('loading');
+        btnGenerate.innerHTML = '<span>🚀</span> Generate Excel Dashboard';
       }
-
-      downloadFinalBtn.addEventListener('click', () => {
-        if (window._backendDownloadUrl) {
-          const a = document.createElement('a');
-          a.href = window._backendDownloadUrl;
-          a.download = outputFilename;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        } else if (generatedWorkbookBlob) {
-          const url = URL.createObjectURL(generatedWorkbookBlob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = outputFilename;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }
-      });
-
-    })();
+    });
   </script>
 </body>
 </html>

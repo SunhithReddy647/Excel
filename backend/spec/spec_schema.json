@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Dashboard Specification",
+  "type": "object",
+  "properties": {
+    "workbook_title": { "type": "string" },
+    "calculations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "formula_template": { "type": "string" },
+          "format": { "type": "string", "enum": ["number","currency","percentage","integer"] },
+          "description": { "type": "string" }
+        },
+        "required": ["name","formula_template","format"]
+      }
+    },
+    "analyses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "metric": { "type": "string" },
+          "aggregation": { "type": "string", "enum": ["SUM","AVERAGE","COUNT","COUNTA","MIN","MAX"] },
+          "group_by": { "type": "array", "items": {"type":"string"} },
+          "sort": { "type": "string" },
+          "description": { "type": "string" }
+        },
+        "required": ["name","metric","aggregation"]
+      }
+    },
+    "charts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "chart_type": { "type": "string", "enum": ["column","bar","line","pie","doughnut","combo","area"] },
+          "title": { "type": "string" },
+          "data_source": { "type": "string" },
+          "category_field": { "type": "string" },
+          "value_field": { "type": "string" },
+          "x_axis_title": { "type": "string" },
+          "y_axis_title": { "type": "string" },
+          "width": { "type": "number" },
+          "height": { "type": "number" }
+        },
+        "required": ["name","chart_type","title","data_source","category_field","value_field"]
+      }
+    },
+    "dashboard": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "kpis": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "metric": { "type": "string" },
+              "aggregation": { "type": "string", "enum": ["SUM","AVERAGE","COUNT","MIN","MAX"] },
+              "format": { "type": "string", "enum": ["number","currency","percentage","integer"] },
+              "label": { "type": "string" }
+            },
+            "required": ["name","metric","aggregation","format","label"]
+          }
+        },
+        "chart_refs": { "type": "array", "items": {"type":"string"} },
+        "filter_refs": { "type": "array", "items": {"type":"string"} }
+      },
+      "required": ["title","kpis"]
+    },
+    "filters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": { "type": "string" },
+          "filter_type": { "type": "string", "enum": ["autofilter","table_filter"] },
+          "description": { "type": "string" }
+        },
+        "required": ["field","filter_type"]
+      }
+    },
+    "sheets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "sheet_type": { "type": "string", "enum": ["raw_data","calculations","analysis","charts","dashboard","assignment"] },
+          "description": { "type": "string" }
+        },
+        "required": ["name","sheet_type"]
+      }
+    }
+  },
+  "required": ["workbook_title","dashboard"]
+}
