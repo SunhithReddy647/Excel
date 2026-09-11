@@ -406,6 +406,25 @@
       box-shadow: 0 0 0 3px rgba(16, 124, 65, 0.12);
     }
 
+    .q-chip {
+      background: white;
+      border: 1px solid var(--border-strong);
+      border-radius: 9999px;
+      padding: 5px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .q-chip:hover {
+      background: var(--excel-light);
+      border-color: #C6E7D1;
+      color: var(--excel-dark);
+      transform: translateY(-1px);
+    }
+
     .btn-build {
       background: var(--excel-green);
       color: white;
@@ -653,6 +672,39 @@
         </div>
       </div>
 
+      <!-- 2. AI Question & Business Objective -->
+      <div class="question-section" style="margin-top: 24px; background: #F8FAFC; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 22px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+          <label class="form-label" style="margin-bottom: 0; display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.1rem;">✨</span> <strong>Client Question &amp; Business Objective</strong>
+            <span style="font-size: 0.76rem; background: var(--excel-light); color: var(--excel-dark); border: 1px solid #C6E7D1; padding: 2px 8px; border-radius: 9999px; font-weight: 700;">Gemini 3.6 Flash Active</span>
+          </label>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">AI synthesizes data against your exact question</span>
+        </div>
+        <textarea id="clientQuestion" class="form-input" rows="3" style="resize: vertical; font-family: inherit; line-height: 1.5; font-size: 0.9rem;" placeholder="e.g., Create a sales executive dashboard comparing Revenue and Units across Regions, show monthly revenue trends, rank top products, and add slicers for Region and Month."></textarea>
+
+        <!-- Question Inspiration Chips -->
+        <div style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+          <span style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Quick Prompt:</span>
+          <button type="button" class="q-chip" data-q="Compare total Revenue and Units across Regions, show monthly revenue trends, rank top products, and add slicers for Region and Month.">💼 Regional Sales &amp; Trend</button>
+          <button type="button" class="q-chip" data-q="Analyze Revenue, Cost, and Profit Margin across Product Categories, highlight top-performing departments, and add slicers.">📈 Profit &amp; Margin Breakdown</button>
+          <button type="button" class="q-chip" data-q="Show average salary and headcount by Department, analyze performance ratings, and filter by Department and Status.">👥 Headcount &amp; Compensation</button>
+          <button type="button" class="q-chip" data-q="Analyze inventory stock levels, warehouse fulfillment rates, and delivery performance over time.">📦 Supply Chain &amp; Inventory</button>
+        </div>
+
+        <!-- Optional Question Document Upload -->
+        <div style="margin-top: 14px; display: flex; align-items: center; gap: 12px; border-top: 1px dashed var(--border-subtle); padding-top: 12px; flex-wrap: wrap;">
+          <label for="qFileInput" style="cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--navy); display: inline-flex; align-items: center; gap: 6px; background: white; border: 1px solid #BFDBFE; padding: 6px 14px; border-radius: var(--radius-sm); transition: all 0.15s ease;">
+            <span>📎 Attach Question Doc (.pdf, .docx, .txt, image)</span>
+            <input type="file" id="qFileInput" accept=".pdf,.docx,.txt,.png,.jpg,.jpeg,.webp" style="display: none;" />
+          </label>
+          <div id="qFileBadge" style="display: none; align-items: center; gap: 8px; font-size: 0.82rem; background: #EFF6FF; border: 1px solid #BFDBFE; padding: 4px 12px; border-radius: var(--radius-sm); color: var(--navy); font-weight: 600;">
+            <span id="qFileNameText">file.pdf</span>
+            <button type="button" id="removeQFileBtn" style="border: none; background: none; cursor: pointer; color: #EF4444; font-size: 0.95rem; line-height: 1;" title="Remove file">✕</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Customization -->
       <div class="form-group">
         <label class="form-label" for="dashboardTitle">Dashboard Title (Optional)</label>
@@ -758,6 +810,13 @@
       const sampleOpsBtn = document.getElementById('sampleOpsBtn');
 
       const dashboardTitle = document.getElementById('dashboardTitle');
+      const clientQuestion = document.getElementById('clientQuestion');
+      const qFileInput = document.getElementById('qFileInput');
+      const qFileBadge = document.getElementById('qFileBadge');
+      const qFileNameText = document.getElementById('qFileNameText');
+      const removeQFileBtn = document.getElementById('removeQFileBtn');
+      let currentQuestionFile = null;
+
       const buildBtn = document.getElementById('buildBtn');
       const progressPanel = document.getElementById('progressPanel');
       const progressTitle = document.getElementById('progressTitle');
@@ -934,6 +993,33 @@
         downloadCard.style.display = 'none';
       }
 
+      // Wire up Question inspiration chips
+      document.querySelectorAll('.q-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          clientQuestion.value = chip.getAttribute('data-q');
+          clientQuestion.focus();
+        });
+      });
+
+      // Question document upload handler
+      if (qFileInput) {
+        qFileInput.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files.length > 0) {
+            currentQuestionFile = e.target.files[0];
+            qFileNameText.textContent = currentQuestionFile.name;
+            qFileBadge.style.display = 'inline-flex';
+          }
+        });
+      }
+
+      if (removeQFileBtn) {
+        removeQFileBtn.addEventListener('click', () => {
+          currentQuestionFile = null;
+          if (qFileInput) qFileInput.value = '';
+          qFileBadge.style.display = 'none';
+        });
+      }
+
       buildBtn.addEventListener('click', async () => {
         if (parsedHeaders.length === 0 || parsedRows.length === 0) {
           alert("Please upload a client data file (.csv, .xlsx) or click one of the sample datasets first.");
@@ -944,18 +1030,30 @@
         progressPanel.style.display = 'block';
         downloadCard.style.display = 'none';
 
-        setStep(1, "Ingesting client dataset schema...", 25);
+        setStep(1, "Ingesting client dataset schema & data types...", 25);
         await sleep(400);
 
-        if (currentFile) {
+        let uploadFile = currentFile;
+        // If a sample dataset is used without an explicit file upload, build a virtual CSV file
+        if (!uploadFile && parsedRows.length > 0) {
+          const csvLines = [parsedHeaders.join(",")];
+          parsedRows.forEach(r => csvLines.push(r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")));
+          const csvBlob = new Blob([csvLines.join("\n")], { type: "text/csv" });
+          const safeTitle = (dashboardTitle.value || "Dataset").trim().replace(/\s+/g, "_");
+          uploadFile = new File([csvBlob], `${safeTitle}.csv`, { type: "text/csv" });
+        }
+
+        if (uploadFile) {
           try {
-            setStep(2, "Communicating with ExcelFlow backend...", 50);
+            setStep(2, "Gemini AI deeply analyzing dataset & business questions...", 50);
             const formData = new FormData();
-            formData.append('file', currentFile);
+            formData.append('file', uploadFile);
             if (dashboardTitle.value) formData.append('title', dashboardTitle.value);
+            if (clientQuestion && clientQuestion.value.trim()) formData.append('question', clientQuestion.value.trim());
+            if (currentQuestionFile) formData.append('question_file', currentQuestionFile);
 
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s for deep AI analysis
 
             const urls = ['/api/dashboard/generate-from-data', 'http://localhost:8000/api/dashboard/generate-from-data'];
             for (let url of urls) {
@@ -968,20 +1066,20 @@
                 if (res.ok) {
                   const data = await res.json();
                   clearTimeout(timeoutId);
-                  setStep(3, "Injecting dynamic Excel formulas & native slicers...", 75);
+                  setStep(3, `AI architected ${data.kpis_created || 4} KPIs, ${data.analyses_created || 2} breakdown tables & native charts...`, 75);
                   await sleep(400);
-                  setStep(4, "Pre-evaluating OpenXML cache...", 100);
+                  setStep(4, `Compiled ${data.formula_count || 16} dynamic formulas (=SUMIFS, =AVERAGEIFS) with cached evaluation...`, 100);
                   await sleep(300);
 
                   outputFilename = data.filename || "Client_Executive_Dashboard.xlsx";
                   generatedWorkbookBlob = null;
                   window._backendDownloadUrl = data.download_url;
 
-                  resSheet.textContent = "Executive_Dashboard";
-                  resFormulas.textContent = `${data.formula_count || 14} Dynamic`;
-                  resMetric.textContent = "Institutional";
-                  resRecords.textContent = `${data.row_count || parsedRows.length} Rows`;
-                  downloadDesc.textContent = `100% genuine dashboard compiled from ${currentFile.name} (Zero hallucination).`;
+                  resSheet.textContent = "01_Executive_Dashboard";
+                  resFormulas.textContent = `${data.formula_count || 16} Dynamic`;
+                  resMetric.textContent = data.ai_used ? "Gemini 3.6 Flash" : "NLP Architect";
+                  resRecords.textContent = `${data.row_count || parsedRows.length} Records`;
+                  downloadDesc.textContent = data.ai_summary || `Tailored executive dashboard compiled directly from ${uploadFile.name} answering your business questions.`;
 
                   showSuccess();
                   return;
@@ -992,7 +1090,7 @@
           } catch (err) {}
         }
 
-        setStep(2, "Analyzing client measures & categorical dimensions...", 50);
+        setStep(2, "Analyzing client measures & business question keywords...", 50);
         await sleep(400);
 
         setStep(3, "Structuring Executive Dashboard with real SUM & SUMIFS formulas...", 75);
@@ -1007,6 +1105,7 @@
       function compileClientWorkbook() {
         const title = dashboardTitle.value.trim() || "Executive Performance Dashboard";
         const numRows = parsedRows.length;
+        const qText = (clientQuestion ? clientQuestion.value : "").toLowerCase();
 
         const colProfiles = parsedHeaders.map((header, colIdx) => {
           let numCount = 0;
@@ -1035,11 +1134,16 @@
         const measures = colProfiles.filter(c => c.isNum);
         function measureScore(m) {
           const l = m.name.toLowerCase();
-          if (l.includes("revenue") || l.includes("sales") || l.includes("amount") || l.includes("spend") || l.includes("budget")) return 10;
-          if (l.includes("profit") || l.includes("variance") || l.includes("margin")) return 9;
-          if (l.includes("cost") || l.includes("expense") || l.includes("price")) return 8;
-          if (l.includes("unit") || l.includes("qty") || l.includes("quantity") || l.includes("weight")) return 7;
-          return 1;
+          let score = 0;
+          if (qText.includes(l)) score += 100;
+          for (const word of l.split(/[\s_]+/)) {
+            if (word.length > 2 && qText.includes(word)) score += 30;
+          }
+          if (l.includes("revenue") || l.includes("sales") || l.includes("amount") || l.includes("spend") || l.includes("budget")) score += 10;
+          if (l.includes("profit") || l.includes("variance") || l.includes("margin")) score += 9;
+          if (l.includes("cost") || l.includes("expense") || l.includes("price")) score += 8;
+          if (l.includes("unit") || l.includes("qty") || l.includes("quantity") || l.includes("weight")) score += 7;
+          return score;
         }
         measures.sort((a, b) => measureScore(b) - measureScore(a));
 
@@ -1049,13 +1153,18 @@
         const dimensions = colProfiles.filter(c => !c.isNum || c.uniqueCount <= 12);
         function dimScore(d) {
           const l = d.name.toLowerCase();
-          if (l.includes("region") || l.includes("territory") || l.includes("country")) return 10;
-          if (l.includes("department") || l.includes("division") || l.includes("category")) return 9;
-          if (l.includes("product") || l.includes("item") || l.includes("carrier")) return 8;
-          if (l.includes("rep") || l.includes("salesperson") || l.includes("name")) return 7;
-          if (l.includes("quarter") || l.includes("month") || l.includes("status")) return 6;
-          if (d.uniqueCount >= 2 && d.uniqueCount <= 15) return 5;
-          return 1;
+          let score = 0;
+          if (qText.includes(l)) score += 100;
+          for (const word of l.split(/[\s_]+/)) {
+            if (word.length > 2 && qText.includes(word)) score += 30;
+          }
+          if (l.includes("region") || l.includes("territory") || l.includes("country")) score += 10;
+          if (l.includes("department") || l.includes("division") || l.includes("category")) score += 9;
+          if (l.includes("product") || l.includes("item") || l.includes("carrier")) score += 8;
+          if (l.includes("rep") || l.includes("salesperson") || l.includes("name")) score += 7;
+          if (l.includes("quarter") || l.includes("month") || l.includes("status")) score += 6;
+          if (d.uniqueCount >= 2 && d.uniqueCount <= 15) score += 5;
+          return score;
         }
         dimensions.sort((a, b) => dimScore(b) - dimScore(a));
 

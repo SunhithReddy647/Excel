@@ -30,6 +30,7 @@ from services.question_parser import extract_question_text, generate_plan
 from services.workbook_generator import generate_workbook
 from services.validator import validate_workbook
 from services.auto_dashboard_architect import architect_executive_plan
+from services.ai_dashboard_synthesizer import synthesize_ai_dashboard_plan
 
 router = APIRouter()
 
@@ -534,13 +535,15 @@ async def get_examples():
 async def generate_dashboard_from_data(
     file: UploadFile = File(...),
     title: Optional[str] = Form(None),
+    question: Optional[str] = Form(None),
     prompt: Optional[str] = Form(None),
+    question_file: Optional[UploadFile] = File(None),
     session: AsyncSession = Depends(get_session),
 ):
     """
-    Direct client endpoint: Upload any dataset (CSV, XLSX, XLS),
-    automatically architect the optimal executive plan, and generate
-    the fully functional Excel workbook with real formulas, slicers, and charts.
+    Direct client endpoint: Upload any dataset (CSV, XLSX, XLS) and optional
+    question/assignment text or file. Uses Gemini AI to deeply analyze both
+    the data and question asked to compile a tailored, executive Excel dashboard.
     """
     ext = Path(file.filename).suffix.lower()
     if ext not in ALLOWED_DATA_EXTENSIONS:
@@ -558,23 +561,56 @@ async def generate_dashboard_from_data(
     with open(file_path, "wb") as f:
         f.write(content)
 
+    # Handle question file if provided
+    extracted_q_text = ""
+    if question_file and question_file.filename:
+        q_ext = Path(question_file.filename).suffix.lower()
+        source_type_map = {
+            ".pdf": "pdf",
+            ".docx": "docx",
+            ".txt": "txt",
+            ".png": "image",
+            ".jpg": "image",
+            ".jpeg": "image",
+            ".webp": "image",
+        }
+        source_type = source_type_map.get(q_ext)
+        if source_type:
+            q_id = str(uuid.uuid4())
+            q_file_path = str(settings.upload_dir / f"{q_id}{q_ext}")
+            q_bytes = await question_file.read()
+            with open(q_file_path, "wb") as f:
+                f.write(q_bytes)
+            try:
+                extracted_q_text = extract_question_text(q_file_path, source_type)
+            except Exception:
+                pass
+
+    raw_question = (question or prompt or "").strip()
+    full_question = f"{raw_question}\n{extracted_q_text}".strip() if extracted_q_text else raw_question
+
     try:
         # 1. Profile dataset
         df, profile = profile_dataset(file_path)
         profile.dataset_id = dataset_id
         profile.filename = file.filename
 
-        # 2. Architect optimal executive plan
+        # 2. Architect tailored executive plan with AI synthesis
         dashboard_title = title.strip() if title else f"Executive {Path(file.filename).stem.replace('_', ' ').title()} Dashboard"
-        plan = architect_executive_plan(df, profile, title=dashboard_title, user_prompt=prompt)
+        plan, ai_meta = synthesize_ai_dashboard_plan(
+            df=df,
+            profile=profile,
+            question_text=full_question,
+            title=dashboard_title,
+        )
 
         # 3. Generate workbook
         workbook_id = str(uuid.uuid4())
-        safe_title = dashboard_title.replace(" ", "_").replace("/", "_")
+        safe_title = re.sub(r'[\\/*?:"<>| ]', '_', plan.workbook_title)
         gen_filename = f"{safe_title}.xlsx"
         output_path = str(settings.generated_dir / f"{workbook_id}.xlsx")
 
-        summary = generate_workbook(df, plan, prompt or "Executive Dashboard Generation", output_path)
+        summary = generate_workbook(df, plan, full_question or "Executive Dashboard Generation", output_path)
 
         # 4. Validate workbook
         validation = validate_workbook(output_path, plan)
@@ -618,6 +654,11 @@ async def generate_dashboard_from_data(
             "native_pivots": summary.get("native_pivots", False),
             "slicers_created": summary.get("slicers_created", 0),
             "validation_status": validation.overall_status,
+            "ai_used": ai_meta.get("ai_used", False),
+            "ai_summary": ai_meta.get("summary", ""),
+            "question_analyzed": ai_meta.get("question_analyzed", full_question),
+            "kpis_created": len(plan.dashboard.kpis) if plan.dashboard else 0,
+            "analyses_created": len(plan.analyses),
         }
     except Exception as e:
         if os.path.exists(file_path):

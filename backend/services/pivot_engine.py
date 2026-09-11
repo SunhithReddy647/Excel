@@ -49,6 +49,8 @@ def is_excel_com_available() -> bool:
     if sys.platform != "win32":
         return False
     try:
+        import pythoncom
+        pythoncom.CoInitialize()
         import win32com.client
         excel = win32com.client.DispatchEx("Excel.Application")
         excel.Visible = False
@@ -58,6 +60,11 @@ def is_excel_com_available() -> bool:
     except Exception as e:
         logger.warning(f"Excel COM automation not available: {e}")
         return False
+    finally:
+        try:
+            pythoncom.CoUninitialize()
+        except Exception:
+            pass
 
 
 class NativePivotEngine:
@@ -211,7 +218,10 @@ class NativePivotEngine:
                     excel.Quit()
                 except Exception:
                     pass
-            pythoncom.CoUninitialize()
+            try:
+                pythoncom.CoUninitialize()
+            except Exception:
+                pass
 
     def _find_raw_data_sheet(self, wb):
         """Find the raw data sheet by name or convention."""
