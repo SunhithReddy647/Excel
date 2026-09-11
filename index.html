@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ExcelFlow — Intelligent Client Data to Executive Excel Dashboard</title>
-  <meta name="description" content="Upload any client dataset (CSV, XLSX) to generate a fully functional, 100% faithful Microsoft Excel executive dashboard with real dynamic formulas, summary tables, and native slicers.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
+  <title>ExcelFlow — Institutional Client Data to Executive Excel Workbooks</title>
+  <meta name="description" content="Convert any raw client dataset (CSV, XLSX) into an executive-grade, fully functional Microsoft Excel dashboard with real formulas, interactive slicers, and native charts.">
   <style>
+    
     :root {
       --bg: #F8FAFC;
       --card-bg: #FFFFFF;
@@ -53,7 +55,7 @@
 
     /* Header */
     header {
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-subtle);
       position: sticky;
@@ -62,13 +64,19 @@
     }
 
     .nav-container {
-      max-width: 1120px;
+      max-width: 1160px;
       margin: 0 auto;
       padding: 0 24px;
       height: 68px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 32px;
     }
 
     .logo-badge {
@@ -99,1249 +107,600 @@
       letter-spacing: -0.02em;
     }
 
-    .status-pill {
-      display: inline-flex;
+    .nav-links {
+      display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 0.8rem;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
       font-weight: 600;
-      color: var(--forest);
-      background: #DCFCE7;
-      border: 1px solid #BBF7D0;
-      padding: 5px 12px;
-      border-radius: 9999px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s ease;
     }
 
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--forest);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
-    }
-
-    /* Hero Section */
-    .hero-section {
-      padding: 48px 24px 28px;
-      text-align: center;
-      max-width: 860px;
-      margin: 0 auto;
-    }
-
-    .badge-subtle {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--excel-light);
-      color: var(--excel-dark);
-      border: 1px solid #C6E7D1;
-      padding: 5px 14px;
-      border-radius: 9999px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      margin-bottom: 18px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    h1 {
-      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
-      font-weight: 800;
-      letter-spacing: -0.035em;
-      line-height: 1.15;
+    .nav-link:hover {
       color: var(--text-main);
-      margin-bottom: 16px;
+      background: #F1F5F9;
     }
 
-    h1 span {
-      background: linear-gradient(135deg, #107C41 0%, #1E3A8A 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero-desc {
-      font-size: 1.08rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-      max-width: 680px;
-      margin: 0 auto 32px;
-    }
-
-    /* Main Intake Console */
-    .console-wrapper {
-      max-width: 780px;
-      margin: 0 auto 56px;
-      padding: 0 20px;
-      width: 100%;
-    }
-
-    .console-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-xl);
-      padding: 34px;
-      box-shadow: var(--shadow-xl);
-      position: relative;
-    }
-
-    /* Dropzone */
-    .dropzone {
-      border: 2px dashed #CBD5E1;
-      border-radius: var(--radius-lg);
-      padding: 36px 24px;
-      text-align: center;
-      background: #F8FAFC;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      position: relative;
-    }
-
-    .dropzone:hover, .dropzone.drag-over {
-      border-color: var(--excel-green);
+    .nav-link.active {
+      color: var(--excel-green);
       background: var(--excel-light);
-    }
-
-    .dropzone-icon {
-      font-size: 2.6rem;
-      margin-bottom: 12px;
-      display: inline-block;
-    }
-
-    .dropzone-title {
-      font-size: 1.05rem;
       font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 6px;
     }
 
-    .dropzone-subtitle {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .dropzone input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-    }
-
-    /* File Loaded State */
-    .file-loaded-banner {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      background: #EFF6FF;
-      border: 1px solid #BFDBFE;
-      padding: 14px 18px;
-      border-radius: var(--radius-md);
-      margin-top: 18px;
-    }
-
-    .file-info-group {
+    .nav-right {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .file-icon {
-      font-size: 1.6rem;
-    }
-
-    .file-name {
+    .btn-nav-maker {
+      background: var(--excel-green);
+      color: white;
+      text-decoration: none;
+      font-size: 0.88rem;
       font-weight: 700;
-      font-size: 0.95rem;
-      color: var(--navy);
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(16, 124, 65, 0.2);
     }
 
-    .file-meta {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 2px;
+    .btn-nav-maker:hover {
+      background: var(--excel-dark);
     }
 
-    .remove-file-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 1.2rem;
-      padding: 4px;
-      line-height: 1;
-    }
-
-    .remove-file-btn:hover {
-      color: #EF4444;
-    }
-
-    /* 1-Click Samples */
-    .sample-section {
-      margin-top: 24px;
-    }
-
-    .sample-label {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    .sample-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .sample-chip {
-      background: #F1F5F9;
-      border: 1px solid var(--border-subtle);
-      border-radius: 9999px;
-      padding: 6px 14px;
-      font-size: 0.82rem;
-      font-weight: 600;
+    .btn-nav-ref {
       color: var(--text-main);
-      cursor: pointer;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: white;
       transition: all 0.15s ease;
       display: inline-flex;
       align-items: center;
       gap: 6px;
     }
 
-    .sample-chip:hover {
-      background: #E2E8F0;
+    .btn-nav-ref:hover {
+      background: #F8FAFC;
       border-color: #94A3B8;
-    }
-
-    .sample-chip.active {
-      background: var(--navy-light);
-      border-color: #93C5FD;
-      color: var(--navy);
-      font-weight: 700;
-    }
-
-    /* Form Fields */
-    .form-group {
-      margin-top: 22px;
-    }
-
-    .form-label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 8px;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 11px 16px;
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-md);
-      font-family: inherit;
-      font-size: 0.92rem;
-      color: var(--text-main);
-      background: #FFFFFF;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .form-input:focus {
-      border-color: var(--excel-green);
-      box-shadow: 0 0 0 3px rgba(16, 124, 65, 0.12);
-    }
-
-    /* Actions */
-    .action-group {
-      margin-top: 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .btn-build {
-      background: var(--excel-green);
-      color: white;
-      border: none;
-      border-radius: var(--radius-md);
-      padding: 15px 24px;
-      font-size: 1.05rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: 0 4px 10px rgba(16, 124, 65, 0.25);
-      transition: all 0.2s ease;
-    }
-
-    .btn-build:hover:not(:disabled) {
-      background: var(--excel-dark);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(16, 124, 65, 0.35);
-    }
-
-    .btn-build:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-    }
-
-    /* Progress Stepper */
-    .progress-panel {
-      display: none;
-      margin-top: 28px;
-      border-top: 1px solid var(--border-subtle);
-      padding-top: 24px;
-    }
-
-    .progress-header {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .steps-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .step-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .step-item.active {
-      color: var(--excel-green);
-      font-weight: 600;
-    }
-
-    .step-item.done {
-      color: var(--forest);
-    }
-
-    .step-icon {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: 2px solid var(--border-strong);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      flex-shrink: 0;
-    }
-
-    .step-item.active .step-icon {
-      border-color: var(--excel-green);
-      background: var(--excel-light);
-      color: var(--excel-green);
-    }
-
-    .step-item.done .step-icon {
-      border-color: var(--forest);
-      background: var(--forest);
-      color: white;
-    }
-
-    /* Download Result Card */
-    .download-result-card {
-      display: none;
-      margin-top: 28px;
-      background: #F0FDF4;
-      border: 1px solid #BBF7D0;
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      text-align: center;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .success-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--forest);
-      font-weight: 800;
-      font-size: 1.1rem;
-      margin-bottom: 6px;
-    }
-
-    .result-desc {
-      font-size: 0.88rem;
-      color: #166534;
-      margin-bottom: 20px;
-    }
-
-    .result-metrics {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 10px;
-      margin-bottom: 24px;
-      text-align: left;
-    }
-
-    .metric-box {
-      background: white;
-      border: 1px solid #DCFCE7;
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-    }
-
-    .metric-box-label {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .metric-box-val {
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: var(--text-main);
-      margin-top: 2px;
-    }
-
-    .btn-download-final {
-      background: var(--excel-green);
-      color: white;
-      text-decoration: none;
-      border-radius: var(--radius-md);
-      padding: 14px 28px;
-      font-size: 1.05rem;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: 0 4px 12px rgba(16, 124, 65, 0.3);
-      cursor: pointer;
-      border: none;
-      width: 100%;
-    }
-
-    .btn-download-final:hover {
-      background: var(--excel-dark);
-    }
-
-    /* What is inside Excel (Technical Excellence Grid) */
-    .specs-section {
-      max-width: 1080px;
-      margin: 10px auto 64px;
-      padding: 0 24px;
-    }
-
-    .specs-title {
-      text-align: center;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 28px;
-    }
-
-    .specs-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 20px;
-    }
-
-    .spec-card {
-      background: white;
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 24px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .spec-icon {
-      font-size: 1.6rem;
-      margin-bottom: 12px;
-    }
-
-    .spec-heading {
-      font-size: 0.98rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 6px;
-    }
-
-    .spec-detail {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      line-height: 1.5;
     }
 
     /* Footer */
     footer {
       margin-top: auto;
       border-top: 1px solid var(--border-subtle);
-      padding: 28px 24px;
+      padding: 40px 24px;
       background: white;
-      text-align: center;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
     }
 
-    .footer-content {
-      max-width: 1120px;
+    .footer-container {
+      max-width: 1160px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 16px;
       align-items: center;
+      text-align: center;
+    }
+
+    .footer-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .footer-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-nav a:hover {
+      color: var(--excel-green);
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .btn-nav-ref { display: none; }
+    }
+
+
+    /* Landing Page Specific Styles */
+    .hero {
+      padding: 68px 24px 44px;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .badge-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--excel-light);
+      color: var(--excel-dark);
+      border: 1px solid #C6E7D1;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 22px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #107C41 0%, #1E3A8A 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      max-width: 720px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 48px;
+    }
+
+    .btn-primary-hero {
+      background: var(--excel-green);
+      color: white;
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 14px 28px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 14px rgba(16, 124, 65, 0.25);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary-hero:hover {
+      background: var(--excel-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary-hero {
+      background: white;
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-weight: 600;
+      padding: 14px 24px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-strong);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-secondary-hero:hover {
+      background: #F8FAFC;
+      border-color: #94A3B8;
+    }
+
+    /* Pillars Section */
+    .section-container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 48px;
+    }
+
+    .section-tag {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--excel-green);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .section-title {
+      font-size: 2.1rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--text-main);
+      margin-bottom: 12px;
+    }
+
+    .section-desc {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+    }
+
+    .pillar-card {
+      background: white;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 32px 24px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .pillar-card:hover {
+      border-color: var(--excel-green);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .pillar-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--excel-light);
+      color: var(--excel-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    .pillar-heading {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 10px;
+    }
+
+    .pillar-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Workflow Steps */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .step-card {
+      background: white;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      position: relative;
+    }
+
+    .step-badge {
+      font-size: 0.75rem;
+      font-weight: 800;
+      background: var(--navy-light);
+      color: var(--navy);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+
+    /* Comparison Table */
+    .comparison-card {
+      background: white;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      margin-top: 24px;
+    }
+
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    .comp-table th {
+      background: #F8FAFC;
+      padding: 16px 20px;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .comp-table td {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+    }
+
+    .comp-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .comp-feature {
+      font-weight: 600;
+      color: var(--text-main) !important;
+    }
+
+    .comp-good {
+      color: var(--forest) !important;
+      font-weight: 700;
+    }
+
+    .comp-bad {
+      color: #EF4444 !important;
+    }
+
+    /* CTA Section */
+    .cta-banner {
+      background: linear-gradient(135deg, #107C41 0%, #1E3A8A 100%);
+      color: white;
+      border-radius: var(--radius-xl);
+      padding: 56px 36px;
+      text-align: center;
+      margin: 40px auto 80px;
+      max-width: 1100px;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .cta-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .cta-desc {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      max-width: 640px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+
+    .btn-cta-white {
+      background: white;
+      color: var(--excel-dark);
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-weight: 800;
+      padding: 14px 32px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
   </style>
 </head>
 <body>
-
-  <!-- Navigation Bar -->
+  
   <header>
     <div class="nav-container">
-      <a href="#" class="logo-badge">
-        <div class="excel-icon">X</div>
-        <span class="brand-name font-display">ExcelFlow</span>
-      </a>
+      <div class="nav-left">
+        <a href="index.html" class="logo-badge">
+          <div class="excel-icon">X</div>
+          <span class="brand-name font-display">ExcelFlow</span>
+        </a>
 
-      <div class="status-pill">
-        <span class="status-dot"></span>
-        <span>Dynamic Data Intake Active</span>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link active">Home</a></li>
+          <li><a href="maker.html" class="nav-link ">Excel Maker Studio</a></li>
+          <li><a href="info.html" class="nav-link ">Architecture &amp; Docs</a></li>
+          <li><a href="tools.html" class="nav-link ">Data Utilities</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-right">
+        <a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download class="btn-nav-ref">
+          <span>⬇️ Sample .xlsx</span>
+        </a>
+        <a href="maker.html" class="btn-nav-maker font-display">
+          <span>⚡ Launch Maker</span>
+        </a>
       </div>
     </div>
   </header>
 
-  <!-- Hero Title -->
-  <section class="hero-section">
-    <div class="badge-subtle">Client Data Intake &amp; Executive Workbook Engine</div>
-    <h1 class="font-display">Turn Any Client Data into an <span>Executive Excel Dashboard</span></h1>
-    <p class="hero-desc">
-      Upload your raw CSV or Excel dataset. The engine automatically designs dynamic formulas, interactive slicers, summary tables, and native charts — delivered exclusively inside a functional Microsoft Excel (.xlsx) workbook.
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="badge-hero">Institutional Spreadsheet Engineering Platform</div>
+    <h1 class="hero-title font-display">Turn Any Client Data into a <span>Functional Excel Dashboard</span></h1>
+    <p class="hero-subtitle">
+      No web dashboard clutter. Ingest any raw client dataset (CSV, XLSX) and instantly compile a submission-ready Microsoft Excel workbook with real dynamic formulas, interactive slicers, and native visual charts.
     </p>
+
+    <div class="hero-actions">
+      <a href="maker.html" class="btn-primary-hero font-display">
+        <span>⚡ Launch Excel Maker Studio</span>
+      </a>
+      <a href="tools.html" class="btn-secondary-hero">
+        <span>🛠️ Open Data Utilities</span>
+      </a>
+    </div>
   </section>
 
-  <!-- Client Data Intake Console -->
-  <main class="console-wrapper">
-    <div class="console-card">
-
-      <!-- File Dropzone -->
-      <div class="dropzone" id="dropzone">
-        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
-        <div class="dropzone-icon">📁</div>
-        <div class="dropzone-title">Drop your client dataset here, or browse files</div>
-        <div class="dropzone-subtitle">Supports Microsoft Excel (.xlsx, .xls) and CSV datasets up to 25MB</div>
-      </div>
-
-      <!-- File Loaded Notification Banner -->
-      <div class="file-loaded-banner" id="fileBanner">
-        <div class="file-info-group">
-          <span class="file-icon">📊</span>
-          <div>
-            <div class="file-name" id="fileName">dataset.csv</div>
-            <div class="file-meta" id="fileMeta">Ready for processing</div>
-          </div>
-        </div>
-        <button class="remove-file-btn" id="removeFileBtn" title="Remove file">✕</button>
-      </div>
-
-      <!-- 1-Click Sample Datasets -->
-      <div class="sample-section">
-        <span class="sample-label">Or test with verified sample datasets:</span>
-        <div class="sample-chips">
-          <button class="sample-chip" id="sampleSalesBtn">
-            <span>💼</span> Enterprise Regional Sales (48 records)
-          </button>
-          <button class="sample-chip" id="sampleFinanceBtn">
-            <span>📈</span> Corporate Budget &amp; Spend (120 records)
-          </button>
-          <button class="sample-chip" id="sampleOpsBtn">
-            <span>📦</span> Logistics &amp; Fulfillment (80 records)
-          </button>
-        </div>
-      </div>
-
-      <!-- Optional Customization -->
-      <div class="form-group">
-        <label class="form-label" for="dashboardTitle">Dashboard Title (Optional)</label>
-        <input type="text" id="dashboardTitle" class="form-input" placeholder="e.g., Executive Q3 Sales Performance" />
-      </div>
-
-      <!-- Primary Action -->
-      <div class="action-group">
-        <button class="btn-build font-display" id="buildBtn">
-          <span>⚡ Build Best Excel Dashboard</span>
-        </button>
-      </div>
-
-      <!-- Live Build Progress Stepper -->
-      <div class="progress-panel" id="progressPanel">
-        <div class="progress-header">
-          <span id="progressTitle">Architecting Workbook from Client Data...</span>
-          <span class="font-mono text-xs" id="progressPct">0%</span>
-        </div>
-        <div class="steps-list">
-          <div class="step-item" id="step1">
-            <span class="step-icon">1</span>
-            <span>Ingesting &amp; profiling client dataset schema...</span>
-          </div>
-          <div class="step-item" id="step2">
-            <span class="step-icon">2</span>
-            <span>Calculating measures &amp; dimension groupings...</span>
-          </div>
-          <div class="step-item" id="step3">
-            <span class="step-icon">3</span>
-            <span>Generating dynamic formulas (=SUM, =SUMIFS) &amp; summary tables...</span>
-          </div>
-          <div class="step-item" id="step4">
-            <span class="step-icon">4</span>
-            <span>Assembling Executive Dashboard &amp; pre-calculating cache...</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Download Ready State -->
-      <div class="download-result-card" id="downloadCard">
-        <div class="success-badge">✓ Executive Excel Workbook Ready!</div>
-        <p class="result-desc" id="downloadDesc">100% functional workbook built directly from your client dataset.</p>
-
-        <div class="result-metrics">
-          <div class="metric-box">
-            <div class="metric-box-label">Active Sheet</div>
-            <div class="metric-box-val" id="resSheet">Executive_Dashboard</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-box-label">Dynamic Formulas</div>
-            <div class="metric-box-val" id="resFormulas">100% Real</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-box-label">Primary Metric</div>
-            <div class="metric-box-val" id="resMetric">Calculated</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-box-label">Client Records</div>
-            <div class="metric-box-val" id="resRecords">Formatted</div>
-          </div>
-        </div>
-
-        <button class="btn-download-final font-display" id="downloadFinalBtn">
-          <span>⬇️ Download .xlsx Dashboard</span>
-        </button>
-      </div>
-
+  <!-- 4 Pillars Section -->
+  <section class="section-container">
+    <div class="section-header">
+      <span class="section-tag">Core Technical Pillars</span>
+      <h2 class="section-title font-display">Engineered Specifically for Microsoft Excel</h2>
+      <p class="section-desc">Unlike generic AI tools that hallucinate static numbers or corrupt spreadsheet XML, ExcelFlow produces 100% mathematically verified OpenXML workbooks.</p>
     </div>
-  </main>
 
-  <!-- Technical Excellence Guarantee Grid (Explains what is functional in Excel) -->
-  <section class="specs-section">
-    <div class="specs-title">Engineered Exclusively for Microsoft Excel Functionality</div>
-    <div class="specs-grid">
-      <div class="spec-card">
-        <div class="spec-icon">⚡</div>
-        <div class="spec-heading font-display">100% Dynamic Formulas</div>
-        <p class="spec-detail">Every KPI card and summary table uses active Excel formulas (=SUM, =SUMIFS, =AVERAGE, =COUNTA). Zero hardcoded static text.</p>
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <div class="pillar-icon">⚡</div>
+        <h3 class="pillar-heading font-display">100% Dynamic Formulas</h3>
+        <p class="pillar-desc">Every metric uses active Excel functions: =SUM, =SUMIFS, =AVERAGE, =COUNTA, and weighted ratios. When data updates, the dashboard recalculates automatically.</p>
       </div>
 
-      <div class="spec-card">
-        <div class="spec-icon">🎛️</div>
-        <div class="spec-heading font-display">Native Interactive Slicers</div>
-        <p class="spec-detail">Integrated with Excel's native SlicerCaches for instant visual filtering across regions, categories, and periods.</p>
+      <div class="pillar-card">
+        <div class="pillar-icon">🎛️</div>
+        <h3 class="pillar-heading font-display">Native Interactive Slicers</h3>
+        <p class="pillar-desc">Engineered with authentic Excel SlicerCaches. Filter multi-dimensional data by region, department, or time period with a single click in Excel.</p>
       </div>
 
-      <div class="spec-card">
-        <div class="spec-icon">📊</div>
-        <div class="spec-heading font-display">Embedded Visual Charts</div>
-        <p class="spec-detail">High-resolution column, trend line, and donut charts bound directly to structured data ranges on the dashboard.</p>
+      <div class="pillar-card">
+        <div class="pillar-icon">📊</div>
+        <h3 class="pillar-heading font-display">Embedded Native Charts</h3>
+        <p class="pillar-desc">Clustered column, line trend, and donut charts bound directly to calculated data tables with professional corporate palettes and gridlines.</p>
       </div>
 
-      <div class="spec-card">
-        <div class="spec-icon">🛡️</div>
-        <div class="spec-heading font-display">Certified OpenXML Format</div>
-        <p class="spec-detail">Pre-evaluated formula values ensure instant rendering in Microsoft Excel, Apple Numbers, and web spreadsheet viewers.</p>
+      <div class="pillar-card">
+        <div class="pillar-icon">🛡️</div>
+        <h3 class="pillar-heading font-display">Zero Hallucination</h3>
+        <p class="pillar-desc">Your uploaded data is the absolute ground truth. 100% of your records and headers are preserved in Raw_Data without altered or fabricated entries.</p>
       </div>
     </div>
   </section>
 
-  <!-- Footer -->
+  <!-- 3-Step Process -->
+  <section class="section-container" style="background: white; border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); margin-bottom: 60px;">
+    <div class="section-header">
+      <span class="section-tag">Streamlined Pipeline</span>
+      <h2 class="section-title font-display">How ExcelFlow Operates</h2>
+      <p class="section-desc">From raw client numbers to executive-ready spreadsheet in seconds.</p>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <span class="step-badge">STEP 01</span>
+        <h3 class="pillar-heading font-display">Ingest Client Data</h3>
+        <p class="pillar-desc">Drop your CSV or Excel workbook. The engine automatically profiles schema, classifies measures vs. dimensions, and validates formatting.</p>
+      </div>
+
+      <div class="step-card">
+        <span class="step-badge">STEP 02</span>
+        <h3 class="pillar-heading font-display">Architect Calculations</h3>
+        <p class="pillar-desc">Identifies primary and secondary metrics, structures multi-criteria SUMIFS summary tables, and configures native interactive Slicers.</p>
+      </div>
+
+      <div class="step-card">
+        <span class="step-badge">STEP 03</span>
+        <h3 class="pillar-heading font-display">Download Functional .XLSX</h3>
+        <p class="pillar-desc">Delivers a certified Microsoft Excel workbook with pre-calculated OpenXML cache for immediate presentation across all spreadsheet software.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Capability Comparison -->
+  <section class="section-container">
+    <div class="section-header">
+      <span class="section-tag">Market Comparison</span>
+      <h2 class="section-title font-display">Why Financial Analysts Choose ExcelFlow</h2>
+    </div>
+
+    <div class="comparison-card">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Architecture Capability</th>
+            <th>Traditional Templates</th>
+            <th>Generic AI Prompts</th>
+            <th style="background: var(--excel-light); color: var(--excel-dark);">ExcelFlow Engine</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="comp-feature">Calculation Method</td>
+            <td>Manual formulas</td>
+            <td class="comp-bad">Hardcoded static text</td>
+            <td class="comp-good">100% Dynamic Formulas (=SUM, =SUMIFS)</td>
+          </tr>
+          <tr>
+            <td class="comp-feature">Interactive Filtering</td>
+            <td>Static merged boxes</td>
+            <td class="comp-bad">Fake text placeholders</td>
+            <td class="comp-good">Native Microsoft Excel Slicers</td>
+          </tr>
+          <tr>
+            <td class="comp-feature">Client Data Fidelity</td>
+            <td>High effort manual paste</td>
+            <td class="comp-bad">Hallucinates fictional numbers</td>
+            <td class="comp-good">Zero Hallucination (Direct Raw_Data Ingest)</td>
+          </tr>
+          <tr>
+            <td class="comp-feature">Spreadsheet Compatibility</td>
+            <td>Variable</td>
+            <td class="comp-bad">Corruption / Repair warnings</td>
+            <td class="comp-good">Certified Clean OpenXML Cache</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CTA Banner -->
+  <div class="cta-banner">
+    <h2 class="cta-title font-display">Ready to Architect Your Executive Dashboard?</h2>
+    <p class="cta-desc">Upload your client data now to experience institutional-grade spreadsheet intelligence with zero hallucination.</p>
+    <a href="maker.html" class="btn-cta-white font-display">
+      <span>⚡ Launch Excel Maker Studio</span>
+    </a>
+  </div>
+
+  
   <footer>
-    <div class="footer-content">
-      <div><strong>ExcelFlow</strong> — Client Data Intake &amp; Executive Spreadsheet Engine</div>
-      <div>Designed for institutional reporting, financial modeling, and executive presentations.</div>
+    <div class="footer-container">
+      <ul class="footer-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="maker.html">Excel Maker Studio</a></li>
+        <li><a href="info.html">Technical Architecture</a></li>
+        <li><a href="tools.html">Data Utilities</a></li>
+        <li><a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download>Download Reference Workbook</a></li>
+      </ul>
+      <div><strong>ExcelFlow Platform</strong> — Institutional Client Data to Executive Excel Workbooks</div>
+      <div>100% Dynamic Formulas • Real Slicers &amp; Charts • Zero Hallucination Guarantee</div>
     </div>
   </footer>
 
-  <!-- Application Logic -->
-  <script>
-    (function() {
-      // Ingested Client Data State
-      let parsedHeaders = [];
-      let parsedRows = [];
-      let currentFile = null;
-      let generatedWorkbookBlob = null;
-      let outputFilename = "Executive_Dashboard.xlsx";
-
-      const fileInput = document.getElementById('fileInput');
-      const dropzone = document.getElementById('dropzone');
-      const fileBanner = document.getElementById('fileBanner');
-      const fileName = document.getElementById('fileName');
-      const fileMeta = document.getElementById('fileMeta');
-      const removeFileBtn = document.getElementById('removeFileBtn');
-
-      const sampleSalesBtn = document.getElementById('sampleSalesBtn');
-      const sampleFinanceBtn = document.getElementById('sampleFinanceBtn');
-      const sampleOpsBtn = document.getElementById('sampleOpsBtn');
-
-      const dashboardTitle = document.getElementById('dashboardTitle');
-      const buildBtn = document.getElementById('buildBtn');
-      const progressPanel = document.getElementById('progressPanel');
-      const progressTitle = document.getElementById('progressTitle');
-      const progressPct = document.getElementById('progressPct');
-
-      const step1 = document.getElementById('step1');
-      const step2 = document.getElementById('step2');
-      const step3 = document.getElementById('step3');
-      const step4 = document.getElementById('step4');
-
-      const downloadCard = document.getElementById('downloadCard');
-      const downloadFinalBtn = document.getElementById('downloadFinalBtn');
-      const resSheet = document.getElementById('resSheet');
-      const resFormulas = document.getElementById('resFormulas');
-      const resMetric = document.getElementById('resMetric');
-      const resRecords = document.getElementById('resRecords');
-      const downloadDesc = document.getElementById('downloadDesc');
-
-      // Helper: Column index to Excel letter (0 -> A, 27 -> AB)
-      function getColLetter(colIdx) {
-        let letter = "";
-        let temp = colIdx + 1;
-        while (temp > 0) {
-          let mod = (temp - 1) % 26;
-          letter = String.fromCharCode(65 + mod) + letter;
-          temp = Math.floor((temp - mod) / 26);
-        }
-        return letter;
-      }
-
-      // Drag & Drop
-      ['dragenter', 'dragover'].forEach(eventName => {
-        dropzone.addEventListener(eventName, (e) => {
-          e.preventDefault();
-          dropzone.classList.add('drag-over');
-        });
-      });
-
-      ['dragleave', 'drop'].forEach(eventName => {
-        dropzone.addEventListener(eventName, (e) => {
-          e.preventDefault();
-          dropzone.classList.remove('drag-over');
-        });
-      });
-
-      dropzone.addEventListener('drop', (e) => {
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-          handleFile(e.dataTransfer.files[0]);
-        }
-      });
-
-      fileInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files.length > 0) {
-          handleFile(e.target.files[0]);
-        }
-      });
-
-      function handleFile(file) {
-        currentFile = file;
-        fileName.textContent = file.name;
-        fileMeta.textContent = `${Math.round(file.size / 1024)} KB • Parsing client data...`;
-        fileBanner.style.display = 'flex';
-        dropzone.style.display = 'none';
-        downloadCard.style.display = 'none';
-        [sampleSalesBtn, sampleFinanceBtn, sampleOpsBtn].forEach(b => b.classList.remove('active'));
-
-        const cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
-        if (!dashboardTitle.value) {
-          dashboardTitle.value = "Executive " + cleanName.charAt(0).toUpperCase() + cleanName.slice(1) + " Dashboard";
-        }
-
-        // Parse client data using SheetJS
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          try {
-            const data = new Uint8Array(e.target.result);
-            const wbIn = XLSX.read(data, {type: 'array', cellDates: true});
-            const firstSheet = wbIn.Sheets[wbIn.SheetNames[0]];
-            const raw = XLSX.utils.sheet_to_json(firstSheet, {header: 1, defval: ""});
-
-            if (!raw || raw.length < 2) {
-              fileMeta.textContent = "Error: File must contain at least 1 header row and 1 data row.";
-              return;
-            }
-
-            parsedHeaders = raw[0].map(h => String(h).trim());
-            parsedRows = raw.slice(1).filter(r => r.some(c => c !== "" && c !== null && c !== undefined));
-
-            fileMeta.textContent = `${parsedRows.length} client records • ${parsedHeaders.length} columns • Ready to build`;
-          } catch (err) {
-            fileMeta.textContent = "Error parsing file: " + err.message;
-          }
-        };
-        reader.readAsArrayBuffer(file);
-      }
-
-      removeFileBtn.addEventListener('click', () => {
-        currentFile = null;
-        parsedHeaders = [];
-        parsedRows = [];
-        fileInput.value = '';
-        fileBanner.style.display = 'none';
-        dropzone.style.display = 'block';
-        downloadCard.style.display = 'none';
-      });
-
-      // Sample Dataset Handlers (Loads actual data into parsedHeaders & parsedRows)
-      sampleSalesBtn.addEventListener('click', () => {
-        loadSalesSample();
-      });
-
-      sampleFinanceBtn.addEventListener('click', () => {
-        loadFinanceSample();
-      });
-
-      sampleOpsBtn.addEventListener('click', () => {
-        loadOpsSample();
-      });
-
-      function loadSalesSample() {
-        dashboardTitle.value = "Executive Regional Sales Dashboard";
-        parsedHeaders = ["Order_ID", "Date", "Region", "Sales_Rep", "Product", "Units_Sold", "Unit_Price", "Revenue"];
-        parsedRows = [
-          [1001, "2026-01-05", "North", "David Miller", "Laptop Pro X", 24, 1200, 28800],
-          [1002, "2026-01-08", "South", "Emma Watson", "4K Ultra Monitor", 18, 450, 8100],
-          [1003, "2026-01-12", "East", "Michael Chang", "Cloud Storage Hub", 35, 300, 10500],
-          [1004, "2026-01-15", "West", "Sarah Jenkins", "Ergonomic Keypad", 50, 120, 6000],
-          [1005, "2026-01-20", "North", "David Miller", "4K Ultra Monitor", 22, 450, 9900],
-          [1006, "2026-01-25", "South", "Emma Watson", "Laptop Pro X", 30, 1200, 36000],
-          [1007, "2026-02-02", "East", "Michael Chang", "Laptop Pro X", 15, 1200, 18000],
-          [1008, "2026-02-07", "West", "Sarah Jenkins", "Cloud Storage Hub", 42, 300, 12600],
-          [1009, "2026-02-14", "North", "David Miller", "Ergonomic Keypad", 60, 120, 7200],
-          [1010, "2026-02-20", "South", "Emma Watson", "Cloud Storage Hub", 28, 300, 8400],
-          [1011, "2026-02-25", "East", "Michael Chang", "4K Ultra Monitor", 25, 450, 11250],
-          [1012, "2026-03-03", "West", "Sarah Jenkins", "Laptop Pro X", 20, 1200, 24000],
-          [1013, "2026-03-08", "North", "David Miller", "Laptop Pro X", 18, 1200, 21600],
-          [1014, "2026-03-15", "South", "Emma Watson", "Ergonomic Keypad", 45, 120, 5400],
-          [1015, "2026-03-22", "East", "Michael Chang", "Cloud Storage Hub", 30, 300, 9000],
-          [1016, "2026-03-29", "West", "Sarah Jenkins", "4K Ultra Monitor", 16, 450, 7200]
-        ];
-        activateSampleChip(sampleSalesBtn, "Enterprise Sales Sample (16 records)", "8 columns • Total Rev: $223,950");
-      }
-
-      function loadFinanceSample() {
-        dashboardTitle.value = "Corporate Budget & Spend Performance";
-        parsedHeaders = ["Cost_Center", "Department", "Quarter", "Budget", "Actual_Spend", "Variance", "Status"];
-        parsedRows = [
-          ["CC-101", "Engineering", "Q1", 450000, 428000, 22000, "Under Budget"],
-          ["CC-102", "Marketing", "Q1", 280000, 295000, -15000, "Over Budget"],
-          ["CC-103", "Sales Operations", "Q1", 320000, 310000, 10000, "Under Budget"],
-          ["CC-104", "Product Management", "Q1", 190000, 185000, 5000, "Under Budget"],
-          ["CC-105", "Customer Success", "Q1", 150000, 142000, 8000, "Under Budget"],
-          ["CC-101", "Engineering", "Q2", 480000, 472000, 8000, "Under Budget"],
-          ["CC-102", "Marketing", "Q2", 310000, 330000, -20000, "Over Budget"],
-          ["CC-103", "Sales Operations", "Q2", 340000, 325000, 15000, "Under Budget"],
-          ["CC-104", "Product Management", "Q2", 210000, 205000, 5000, "Under Budget"],
-          ["CC-105", "Customer Success", "Q2", 165000, 160000, 5000, "Under Budget"]
-        ];
-        activateSampleChip(sampleFinanceBtn, "Corporate Budget & Spend Sample (10 records)", "7 columns • Total Spend: $2,852,000");
-      }
-
-      function loadOpsSample() {
-        dashboardTitle.value = "Operations & Logistics Performance";
-        parsedHeaders = ["Shipment_ID", "Origin", "Destination", "Carrier", "Weight_Kg", "Cost", "Delivery_Days"];
-        parsedRows = [
-          ["SHP-801", "Chicago", "Dallas", "FedEx", 450, 1850, 2],
-          ["SHP-802", "Atlanta", "New York", "UPS", 780, 2400, 3],
-          ["SHP-803", "Los Angeles", "Seattle", "DHL", 320, 1400, 1],
-          ["SHP-804", "Dallas", "Miami", "FedEx", 610, 2100, 2],
-          ["SHP-805", "New York", "Boston", "UPS", 240, 950, 1],
-          ["SHP-806", "Seattle", "Denver", "FedEx", 550, 1900, 2],
-          ["SHP-807", "Miami", "Atlanta", "DHL", 410, 1600, 2],
-          ["SHP-808", "Denver", "Chicago", "UPS", 890, 2800, 3]
-        ];
-        activateSampleChip(sampleOpsBtn, "Logistics & Fulfillment Sample (8 records)", "7 columns • Total Cost: $15,000");
-      }
-
-      function activateSampleChip(btn, name, meta) {
-        currentFile = null;
-        [sampleSalesBtn, sampleFinanceBtn, sampleOpsBtn].forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        fileName.textContent = name;
-        fileMeta.textContent = meta;
-        fileBanner.style.display = 'flex';
-        dropzone.style.display = 'none';
-        downloadCard.style.display = 'none';
-      }
-
-      // Build Execution
-      buildBtn.addEventListener('click', async () => {
-        if (parsedHeaders.length === 0 || parsedRows.length === 0) {
-          alert("Please upload a client data file (.csv, .xlsx) or click one of the sample datasets first.");
-          return;
-        }
-
-        buildBtn.disabled = true;
-        progressPanel.style.display = 'block';
-        downloadCard.style.display = 'none';
-
-        setStep(1, "Ingesting client dataset schema...", 25);
-        await sleep(400);
-
-        // Attempt Backend API if a real file was uploaded
-        let backendSucceeded = false;
-        if (currentFile) {
-          try {
-            setStep(2, "Communicating with ExcelFlow backend...", 50);
-            const formData = new FormData();
-            formData.append('file', currentFile);
-            if (dashboardTitle.value) formData.append('title', dashboardTitle.value);
-
-            // Fetch with 4s timeout
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 4000);
-
-            const urls = ['/api/dashboard/generate-from-data', 'http://localhost:8000/api/dashboard/generate-from-data'];
-            for (let url of urls) {
-              try {
-                const res = await fetch(url, {
-                  method: 'POST',
-                  body: formData,
-                  signal: controller.signal
-                });
-                if (res.ok) {
-                  const data = await res.json();
-                  clearTimeout(timeoutId);
-                  setStep(3, "Injecting dynamic Excel formulas & native slicers...", 75);
-                  await sleep(400);
-                  setStep(4, "Pre-evaluating OpenXML cache...", 100);
-                  await sleep(300);
-
-                  outputFilename = data.filename || "Client_Executive_Dashboard.xlsx";
-                  generatedWorkbookBlob = null; // will use download link
-                  window._backendDownloadUrl = data.download_url;
-
-                  resSheet.textContent = "Executive_Dashboard";
-                  resFormulas.textContent = `${data.formula_count || 14} Dynamic`;
-                  resMetric.textContent = "Institutional";
-                  resRecords.textContent = `${data.row_count || parsedRows.length} Rows`;
-                  downloadDesc.textContent = `100% genuine dashboard compiled from ${currentFile.name} (Zero hallucination).`;
-
-                  backendSucceeded = true;
-                  showSuccess();
-                  return;
-                }
-              } catch (e) {
-                // Try next url or fall through to client engine
-              }
-            }
-            clearTimeout(timeoutId);
-          } catch (err) {
-            console.log("Backend offline, generating dashboard directly via client engine.");
-          }
-        }
-
-        // Direct Client-Side Excel Workbook Compiler (Zero Hallucination)
-        setStep(2, "Analyzing client measures & categorical dimensions...", 50);
-        await sleep(400);
-
-        setStep(3, "Structuring Executive Dashboard with real SUM & SUMIFS formulas...", 75);
-        await sleep(500);
-
-        setStep(4, "Finalizing OpenXML workbook from client data...", 100);
-        await sleep(300);
-
-        compileClientWorkbook();
-      });
-
-      function compileClientWorkbook() {
-        const title = dashboardTitle.value.trim() || "Executive Performance Dashboard";
-        const numRows = parsedRows.length;
-
-        // Classify columns
-        const colProfiles = parsedHeaders.map((header, colIdx) => {
-          let numCount = 0;
-          let sum = 0;
-          const vals = [];
-          parsedRows.forEach(r => {
-            const v = r[colIdx];
-            if (v !== "" && v !== null && !isNaN(Number(v))) {
-              numCount++;
-              sum += Number(v);
-            }
-            if (v !== "" && v !== null && v !== undefined) vals.push(String(v));
-          });
-          const isNum = numCount >= numRows * 0.6;
-          const uniques = Array.from(new Set(vals));
-          return {
-            index: colIdx,
-            name: header,
-            isNum,
-            sum,
-            uniques: uniques.slice(0, 20),
-            uniqueCount: uniques.length,
-          };
-        });
-
-        // Identify measures
-        const measures = colProfiles.filter(c => c.isNum);
-        function measureScore(m) {
-          const l = m.name.toLowerCase();
-          if (l.includes("revenue") || l.includes("sales") || l.includes("amount") || l.includes("spend") || l.includes("budget")) return 10;
-          if (l.includes("profit") || l.includes("variance") || l.includes("margin")) return 9;
-          if (l.includes("cost") || l.includes("expense") || l.includes("price")) return 8;
-          if (l.includes("unit") || l.includes("qty") || l.includes("quantity") || l.includes("weight")) return 7;
-          return 1;
-        }
-        measures.sort((a, b) => measureScore(b) - measureScore(a));
-
-        const primaryMeasure = measures[0] || { index: parsedHeaders.length - 1, name: parsedHeaders[parsedHeaders.length - 1], sum: 0 };
-        const secondaryMeasure = measures[1] || null;
-
-        // Identify dimensions
-        const dimensions = colProfiles.filter(c => !c.isNum || c.uniqueCount <= 12);
-        function dimScore(d) {
-          const l = d.name.toLowerCase();
-          if (l.includes("region") || l.includes("territory") || l.includes("country")) return 10;
-          if (l.includes("department") || l.includes("division") || l.includes("category")) return 9;
-          if (l.includes("product") || l.includes("item") || l.includes("carrier")) return 8;
-          if (l.includes("rep") || l.includes("salesperson") || l.includes("name")) return 7;
-          if (l.includes("quarter") || l.includes("month") || l.includes("status")) return 6;
-          if (d.uniqueCount >= 2 && d.uniqueCount <= 15) return 5;
-          return 1;
-        }
-        dimensions.sort((a, b) => dimScore(b) - dimScore(a));
-
-        const primaryDim = dimensions[0] || { index: 0, name: parsedHeaders[0], uniques: ["Total"] };
-        const secondaryDim = (dimensions[1] && dimensions[1].name !== primaryDim.name) ? dimensions[1] : null;
-
-        // Create workbook
-        const wbOut = XLSX.utils.book_new();
-
-        // 1. Executive_Dashboard Worksheet
-        const dashAOA = [];
-        dashAOA.push([title.toUpperCase()]);
-        dashAOA.push([]);
-
-        // KPI Headers
-        const kpiLabels = [
-          "TOTAL " + primaryMeasure.name.toUpperCase(),
-          secondaryMeasure ? "TOTAL " + secondaryMeasure.name.toUpperCase() : "AVERAGE " + primaryMeasure.name.toUpperCase(),
-          "AVERAGE " + primaryMeasure.name.toUpperCase(),
-          "TOTAL RECORDS"
-        ];
-        dashAOA.push(kpiLabels);
-
-        // KPI Values with Dynamic Formulas
-        const pColLetter = getColLetter(primaryMeasure.index);
-        const lastDataRow = numRows + 1;
-        const avgVal = numRows > 0 ? (primaryMeasure.sum / numRows) : 0;
-        const isCurrency = anyKeyword(primaryMeasure.name, ["revenue", "sales", "cost", "price", "amount", "budget", "spend", "profit"]);
-        const currFmt = isCurrency ? "$#,##0" : "#,##0";
-
-        const kpiValues = [
-          { f: `SUM(Raw_Data!${pColLetter}2:${pColLetter}${lastDataRow})`, v: primaryMeasure.sum, z: currFmt },
-          secondaryMeasure
-            ? { f: `SUM(Raw_Data!${getColLetter(secondaryMeasure.index)}2:${getColLetter(secondaryMeasure.index)}${lastDataRow})`, v: secondaryMeasure.sum, z: "#,##0" }
-            : { f: `AVERAGE(Raw_Data!${pColLetter}2:${pColLetter}${lastDataRow})`, v: avgVal, z: currFmt },
-          { f: `AVERAGE(Raw_Data!${pColLetter}2:${pColLetter}${lastDataRow})`, v: avgVal, z: currFmt },
-          { f: `COUNTA(Raw_Data!A2:A${lastDataRow})`, v: numRows, z: "#,##0" }
-        ];
-        dashAOA.push(kpiValues);
-        dashAOA.push([]);
-        dashAOA.push([]);
-
-        // Breakdown Table 1 by Primary Dimension
-        dashAOA.push([`EXECUTIVE BREAKDOWN BY ${primaryDim.name.toUpperCase()}`, primaryMeasure.name.toUpperCase(), "SHARE %"]);
-        const tblStartRow = dashAOA.length + 1;
-        const dimColLetter = getColLetter(primaryDim.index);
-
-        primaryDim.uniques.forEach((catVal) => {
-          let catSum = 0;
-          parsedRows.forEach(r => {
-            if (String(r[primaryDim.index]) === String(catVal)) {
-              catSum += Number(r[primaryMeasure.index]) || 0;
-            }
-          });
-          const share = primaryMeasure.sum > 0 ? (catSum / primaryMeasure.sum) : 0;
-          const currRowIdx = dashAOA.length + 1;
-          dashAOA.push([
-            catVal,
-            { f: `SUMIFS(Raw_Data!${pColLetter}2:${pColLetter}${lastDataRow}, Raw_Data!${dimColLetter}2:${dimColLetter}${lastDataRow}, "${catVal}")`, v: catSum, z: currFmt },
-            { f: `B${currRowIdx}/$B$${tblStartRow + primaryDim.uniques.length}`, v: share, z: "0.0%" }
-          ]);
-        });
-
-        // Grand Total Row
-        const endCatRow = dashAOA.length;
-        dashAOA.push([
-          "Grand Total",
-          { f: `SUM(B${tblStartRow}:B${endCatRow})`, v: primaryMeasure.sum, z: currFmt },
-          { f: `SUM(C${tblStartRow}:C${endCatRow})`, v: 1.0, z: "0.0%" }
-        ]);
-        dashAOA.push([]);
-
-        // Breakdown Table 2 by Secondary Dimension (if present)
-        if (secondaryDim && secondaryDim.uniques.length > 1) {
-          dashAOA.push([]);
-          dashAOA.push([`SECONDARY BREAKDOWN BY ${secondaryDim.name.toUpperCase()}`, primaryMeasure.name.toUpperCase(), "SHARE %"]);
-          const sTblStart = dashAOA.length + 1;
-          const sDimColLetter = getColLetter(secondaryDim.index);
-
-          secondaryDim.uniques.forEach((sVal) => {
-            let sSum = 0;
-            parsedRows.forEach(r => {
-              if (String(r[secondaryDim.index]) === String(sVal)) {
-                sSum += Number(r[primaryMeasure.index]) || 0;
-              }
-            });
-            const sShare = primaryMeasure.sum > 0 ? (sSum / primaryMeasure.sum) : 0;
-            const sRowIdx = dashAOA.length + 1;
-            dashAOA.push([
-              sVal,
-              { f: `SUMIFS(Raw_Data!${pColLetter}2:${pColLetter}${lastDataRow}, Raw_Data!${sDimColLetter}2:${sDimColLetter}${lastDataRow}, "${sVal}")`, v: sSum, z: currFmt },
-              { f: `B${sRowIdx}/$B$${sTblStart + secondaryDim.uniques.length}`, v: sShare, z: "0.0%" }
-            ]);
-          });
-
-          const sEndRow = dashAOA.length;
-          dashAOA.push([
-            "Grand Total",
-            { f: `SUM(B${sTblStart}:B${sEndRow})`, v: primaryMeasure.sum, z: currFmt },
-            { f: `SUM(C${sTblStart}:C${sEndRow})`, v: 1.0, z: "0.0%" }
-          ]);
-        }
-
-        const wsDash = XLSX.utils.aoa_to_sheet(dashAOA);
-        wsDash["!cols"] = [{wch: 32}, {wch: 24}, {wch: 18}, {wch: 18}];
-        XLSX.utils.book_append_sheet(wbOut, wsDash, "Executive_Dashboard");
-
-        // 2. Raw_Data Worksheet (100% Client Data)
-        const rawSheetData = [parsedHeaders, ...parsedRows];
-        const wsRaw = XLSX.utils.aoa_to_sheet(rawSheetData);
-        wsRaw["!cols"] = parsedHeaders.map(h => ({wch: Math.max(12, h.length + 4)}));
-        XLSX.utils.book_append_sheet(wbOut, wsRaw, "Raw_Data");
-
-        // 3. Audit_Trail Worksheet
-        const auditAOA = [
-          ["EXECUTIVE WORKBOOK AUDIT & VALIDATION"],
-          [],
-          ["Validation Check", "Status & Source Detail"],
-          ["Ingested Client Source", currentFile ? currentFile.name : (fileName.textContent || "Client Ingest")],
-          ["Client Records Ingested", `${numRows} rows formatted in Raw_Data`],
-          ["Schema Headers Ingested", `${parsedHeaders.length} columns: ${parsedHeaders.join(', ')}`],
-          ["Primary Metric Model", `${primaryMeasure.name} (SUM: ${isCurrency ? '$' : ''}${primaryMeasure.sum.toLocaleString()})`],
-          ["Primary Dimension", `${primaryDim.name} (${primaryDim.uniques.length} categories)`],
-          ["Formula Engine", "100% Real Dynamic Formulas (=SUM, =SUMIFS, =AVERAGE, =COUNTA)"],
-          ["Zero Hallucination Status", "PASSED — 100% Client Data Integrity Verified"],
-        ];
-        const wsAudit = XLSX.utils.aoa_to_sheet(auditAOA);
-        wsAudit["!cols"] = [{wch: 26}, {wch: 55}];
-        XLSX.utils.book_append_sheet(wbOut, wsAudit, "Audit_Trail");
-
-        // Generate binary and trigger download
-        const cleanTitle = (dashboardTitle.value.trim().replace(/\s+/g, '_') || "Client_Executive_Dashboard");
-        outputFilename = cleanTitle + ".xlsx";
-
-        // Save binary blob
-        const wbout = XLSX.write(wbOut, {bookType: 'xlsx', type: 'array'});
-        generatedWorkbookBlob = new Blob([wbout], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-
-        // Update UI
-        resSheet.textContent = "Executive_Dashboard";
-        resFormulas.textContent = "100% Dynamic";
-        resMetric.textContent = primaryMeasure.name;
-        resRecords.textContent = `${numRows} Rows`;
-        downloadDesc.textContent = `100% authentic dashboard compiled from your data (Zero hallucination).`;
-
-        showSuccess();
-      }
-
-      function anyKeyword(str, kwList) {
-        const l = str.toLowerCase();
-        return kwList.some(k => l.includes(k));
-      }
-
-      function setStep(num, title, pct) {
-        progressTitle.textContent = title;
-        progressPct.textContent = pct + "%";
-
-        const steps = [step1, step2, step3, step4];
-        steps.forEach((s, idx) => {
-          if (idx + 1 < num) {
-            s.className = "step-item done";
-            s.querySelector('.step-icon').textContent = "✓";
-          } else if (idx + 1 === num) {
-            s.className = "step-item active";
-            s.querySelector('.step-icon').textContent = num;
-          } else {
-            s.className = "step-item";
-            s.querySelector('.step-icon').textContent = idx + 1;
-          }
-        });
-      }
-
-      function showSuccess() {
-        buildBtn.disabled = false;
-        progressPanel.style.display = 'none';
-        downloadCard.style.display = 'block';
-        downloadCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-
-      downloadFinalBtn.addEventListener('click', () => {
-        if (window._backendDownloadUrl) {
-          window.location.href = window._backendDownloadUrl;
-          window._backendDownloadUrl = null;
-          return;
-        }
-
-        if (generatedWorkbookBlob) {
-          const url = URL.createObjectURL(generatedWorkbookBlob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = outputFilename;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          setTimeout(() => URL.revokeObjectURL(url), 2000);
-        }
-      });
-
-      function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-      }
-
-      // Initialize with sales sample ready
-      loadSalesSample();
-    })();
-  </script>
 </body>
 </html>

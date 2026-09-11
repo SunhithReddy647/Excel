@@ -4,7 +4,7 @@
   "private": true,
   "description": "Dexcel — Enterprise Spreadsheet Intelligence & Quantitative Analytics Platform",
   "scripts": {
-    "build": "node -e \"const fs=require('fs'); if(!fs.existsSync('public')) fs.mkdirSync('public'); fs.copyFileSync('index.html', 'public/index.html'); console.log('Static site built in public/');\"",
+    "build": "node -e \"const fs=require('fs'); if(!fs.existsSync('public')) fs.mkdirSync('public'); ['index.html','maker.html','info.html','tools.html'].forEach(f => { if(fs.existsSync(f)) fs.copyFileSync(f, 'public/' + f); }); fs.readdirSync('.').filter(f => f.endsWith('.xlsx')).forEach(f => fs.copyFileSync(f, 'public/' + f)); console.log('Multi-page site built in public/');\"",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && venv\\Scripts\\python -m uvicorn main:app --reload --port 8000",
     "build:frontend": "cd frontend && npm run build",
