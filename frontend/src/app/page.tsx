@@ -58,9 +58,18 @@ export default function LandingPage() {
             <span className="text-2xl">📊</span>
             <span className="text-xl font-bold gradient-text">ExcelFlow</span>
           </div>
-          <Link href="/upload" className="btn-primary text-sm py-2 px-6 no-underline">
-            Get Started
-          </Link>
+          <div className="flex items-center gap-3">
+            <a
+              href="/Sales_Executive_Dashboard_Submission_Ready.xlsx"
+              download="Sales_Executive_Dashboard_Submission_Ready.xlsx"
+              className="btn-secondary text-xs py-2 px-4 no-underline hidden sm:inline-flex"
+            >
+              ⬇️ Download .xlsx
+            </a>
+            <Link href="/upload" className="btn-primary text-sm py-2 px-6 no-underline">
+              Get Started
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -88,19 +97,16 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up-delay-3">
-            <Link href="/upload" className="btn-primary text-base px-10 py-3.5 no-underline">
-              Create Excel Workbook
+            <Link href="/upload" className="btn-primary text-base px-8 py-3.5 no-underline">
+              Create Custom Workbook
             </Link>
-            <button
-              className="btn-secondary text-base px-10 py-3.5"
-              onClick={() => {
-                document
-                  .getElementById("features")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }}
+            <a
+              href="/Sales_Executive_Dashboard_Submission_Ready.xlsx"
+              download="Sales_Executive_Dashboard_Submission_Ready.xlsx"
+              className="btn-secondary text-base px-8 py-3.5 no-underline"
             >
-              View Example
-            </button>
+              ⬇️ Download Submission Excel (.xlsx)
+            </a>
           </div>
         </div>
       </section>
