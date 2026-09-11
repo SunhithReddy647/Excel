@@ -42,9 +42,9 @@ SECTION_FONT = Font(name="Calibri", size=11, bold=True, color="1B2A4A")
 def _get_number_format(fmt: str) -> str:
     """Map format type to Excel number format code."""
     formats = {
-        "currency": "₹#,##0",
-        "currency_decimal": "₹#,##0.00",
-        "percentage": "0.00%",
+        "currency": "$#,##0",
+        "currency_decimal": "$#,##0.00",
+        "percentage": "0.0%",
         "number": "#,##0",
         "number_decimal": "#,##0.00",
         "integer": "#,##0",
@@ -139,6 +139,14 @@ class WorkbookGenerator:
             elif sheet_spec.sheet_type == "assignment":
                 self._create_assignment_sheet(sheet_spec.name)
                 sheets_created.append(sheet_spec.name)
+
+        # Ensure Executive Dashboard is active sheet and gridlines are enabled
+        dash_sheet_names = [s.name for s in self.plan.sheets if s.sheet_type == "dashboard"]
+        if dash_sheet_names and dash_sheet_names[0] in self.wb.sheetnames:
+            self.wb.active = self.wb[dash_sheet_names[0]]
+
+        for sheet in self.wb.worksheets:
+            sheet.views.sheetView[0].showGridLines = True
 
         # Save base workbook with openpyxl
         self.wb.save(output_path)
@@ -458,6 +466,7 @@ class WorkbookGenerator:
         if dash_spec.kpis:
             kpi_data = []
             for kpi in dash_spec.kpis:
+                formula = None
                 try:
                     metric_col = kpi.metric
                     if metric_col in self.df.columns:
@@ -465,6 +474,10 @@ class WorkbookGenerator:
                         value = getattr(self.df[metric_col], agg_func)()
                         if isinstance(value, (np.integer, np.floating)):
                             value = float(value)
+                        agg_upper = kpi.aggregation.upper()
+                        # Real dynamic structured formula referencing Excel table
+                        formula = f"={agg_upper}({self.table_name}[{metric_col}])"
+                        self.formula_count += 1
                     else:
                         value = "N/A"
                 except Exception:
@@ -473,6 +486,7 @@ class WorkbookGenerator:
                 kpi_data.append({
                     "label": kpi.label or kpi.name,
                     "value": value,
+                    "formula": formula,
                     "format": kpi.format,
                 })
             dashboard.write_kpis(kpi_data)

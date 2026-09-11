@@ -29,6 +29,7 @@ from services.dataset_profiler import profile_dataset, read_dataset
 from services.question_parser import extract_question_text, generate_plan
 from services.workbook_generator import generate_workbook
 from services.validator import validate_workbook
+from services.auto_dashboard_architect import architect_executive_plan
 
 router = APIRouter()
 
@@ -525,3 +526,103 @@ async def get_examples():
         }
         for name, question in EXAMPLE_QUESTIONS.items()
     }
+
+
+# ─── Direct Client Dashboard Generation ─────────────────────────────
+
+@router.post("/api/dashboard/generate-from-data")
+async def generate_dashboard_from_data(
+    file: UploadFile = File(...),
+    title: Optional[str] = Form(None),
+    prompt: Optional[str] = Form(None),
+    session: AsyncSession = Depends(get_session),
+):
+    """
+    Direct client endpoint: Upload any dataset (CSV, XLSX, XLS),
+    automatically architect the optimal executive plan, and generate
+    the fully functional Excel workbook with real formulas, slicers, and charts.
+    """
+    ext = Path(file.filename).suffix.lower()
+    if ext not in ALLOWED_DATA_EXTENSIONS:
+        raise HTTPException(400, f"Unsupported file type: {ext}. Allowed: {', '.join(ALLOWED_DATA_EXTENSIONS)}")
+
+    content = await file.read()
+    if len(content) > settings.max_file_size_bytes:
+        raise HTTPException(400, f"File too large. Maximum: {settings.max_file_size_mb}MB")
+
+    # Save uploaded file
+    dataset_id = str(uuid.uuid4())
+    safe_filename = f"{dataset_id}{ext}"
+    file_path = str(settings.upload_dir / safe_filename)
+
+    with open(file_path, "wb") as f:
+        f.write(content)
+
+    try:
+        # 1. Profile dataset
+        df, profile = profile_dataset(file_path)
+        profile.dataset_id = dataset_id
+        profile.filename = file.filename
+
+        # 2. Architect optimal executive plan
+        dashboard_title = title.strip() if title else f"Executive {Path(file.filename).stem.replace('_', ' ').title()} Dashboard"
+        plan = architect_executive_plan(df, profile, title=dashboard_title, user_prompt=prompt)
+
+        # 3. Generate workbook
+        workbook_id = str(uuid.uuid4())
+        safe_title = dashboard_title.replace(" ", "_").replace("/", "_")
+        gen_filename = f"{safe_title}.xlsx"
+        output_path = str(settings.generated_dir / f"{workbook_id}.xlsx")
+
+        summary = generate_workbook(df, plan, prompt or "Executive Dashboard Generation", output_path)
+
+        # 4. Validate workbook
+        validation = validate_workbook(output_path, plan)
+        validation.workbook_id = workbook_id
+
+        # 5. Persist to SQLite
+        db_dataset = DBDataset(
+            id=dataset_id,
+            filename=safe_filename,
+            original_filename=file.filename,
+            file_path=file_path,
+            row_count=profile.row_count,
+            column_count=profile.column_count,
+            headers=profile.headers,
+            profile_json=profile.model_dump(),
+        )
+        session.add(db_dataset)
+
+        db_wb = DBWorkbook(
+            id=workbook_id,
+            generation_id=dataset_id,
+            filename=gen_filename,
+            file_path=output_path,
+            validation_json=validation.model_dump(),
+            validation_status=validation.overall_status,
+            summary_json=summary,
+        )
+        session.add(db_wb)
+        await session.commit()
+
+        return {
+            "success": True,
+            "workbook_id": workbook_id,
+            "filename": gen_filename,
+            "download_url": f"/api/workbooks/{workbook_id}/download",
+            "row_count": len(df),
+            "column_count": len(df.columns),
+            "sheets": summary.get("sheets", []),
+            "formula_count": summary.get("formula_count", 0),
+            "chart_count": summary.get("chart_count", 0),
+            "native_pivots": summary.get("native_pivots", False),
+            "slicers_created": summary.get("slicers_created", 0),
+            "validation_status": validation.overall_status,
+        }
+    except Exception as e:
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except Exception:
+                pass
+        raise HTTPException(500, f"Dashboard generation failed: {str(e)}")

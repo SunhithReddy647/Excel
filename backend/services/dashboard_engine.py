@@ -116,24 +116,39 @@ class DashboardEngine:
                 border=thin_border,
             )
 
-            # KPI Value
-            value = kpi["value"]
+            # KPI Value & Dynamic Formula
+            formula = kpi.get("formula")
+            value = kpi.get("value")
             fmt = kpi.get("format", "number")
-            if fmt == "currency":
-                display_value = f"₹{value:,.0f}" if isinstance(value, (int, float)) else str(value)
-            elif fmt == "percentage":
-                display_value = f"{value:.1%}" if isinstance(value, (int, float)) else str(value)
-            else:
-                display_value = f"{value:,.0f}" if isinstance(value, (int, float)) else str(value)
+
+            num_formats = {
+                "currency": "$#,##0",
+                "currency_decimal": "$#,##0.00",
+                "percentage": "0.0%",
+                "integer": "#,##0",
+                "number": "#,##0",
+                "number_decimal": "#,##0.00",
+            }
+            excel_num_format = num_formats.get(fmt, "#,##0")
+
+            cell_val = formula if formula else (
+                f"${value:,.0f}" if fmt == "currency" and isinstance(value, (int, float))
+                else (f"{value:.1%}" if fmt == "percentage" and isinstance(value, (int, float))
+                else (f"{value:,.0f}" if isinstance(value, (int, float)) else str(value)))
+            )
 
             self._merge_and_style(
                 self.current_row + 1, start_col, self.current_row + 2, end_col,
-                value=display_value,
+                value=cell_val,
                 font=Font(name="Calibri", size=22, bold=True, color=color),
                 alignment=Alignment(horizontal="center", vertical="center"),
                 fill=PatternFill(start_color=COLORS["white"], end_color=COLORS["white"], fill_type="solid"),
                 border=thin_border,
             )
+
+            start_cell_ref = f"{get_column_letter(start_col)}{self.current_row + 1}"
+            if formula:
+                self.ws[start_cell_ref].number_format = excel_num_format
 
         self.ws.row_dimensions[self.current_row].height = 20
         self.ws.row_dimensions[self.current_row + 1].height = 30
