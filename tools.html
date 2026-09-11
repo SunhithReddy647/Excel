@@ -3,504 +3,620 @@
 <head>
   
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <title>Data &amp; Excel Utilities — ExcelFlow</title>
+  <title>Data &amp; Spreadsheet Utilities — ExcelFlow</title>
   <meta name="description" content="Browser-based spreadsheet tools: Dataset Schema Inspector, Formula Builder, and CSV to Formatted Excel Converter.">
   <style>
     
     :root {
-      --bg: #F8FAFC;
+      --bg: #FBF8F3;
+      --bg-alt: #F3EFE6;
+      --ink: #0A0A0A;
       --card-bg: #FFFFFF;
-      --text-main: #0F172A;
-      --text-muted: #64748B;
-      --border-subtle: #E2E8F0;
-      --border-strong: #CBD5E1;
-      --excel-green: #107C41;
-      --excel-dark: #0D6535;
+      --excel: #107C41;
+      --excel-hover: #0D6535;
       --excel-light: #EBF7EE;
-      --navy: #1E3A8A;
-      --navy-light: #EFF6FF;
-      --forest: #166534;
-      --amber: #B45309;
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 14px;
-      --radius-xl: 20px;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      --yellow: #FFE600;
+      --yellow-light: #FFFBE6;
+      --blue: #2563EB;
+      --blue-light: #EFF6FF;
+      --coral: #FF5A5F;
+      --coral-light: #FFF1F2;
+      --purple: #8B5CF6;
+      --purple-light: #F5F3FF;
+      --muted: #525252;
+      --border-w: 2.5px;
+      --radius: 8px;
+      --radius-sm: 5px;
+      --radius-pill: 9999px;
+      --shadow-sm: 2px 2px 0px var(--ink);
+      --shadow-md: 4px 4px 0px var(--ink);
+      --shadow-lg: 6px 6px 0px var(--ink);
+      --shadow-xl: 8px 8px 0px var(--ink);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     body {
       background-color: var(--bg);
-      color: var(--text-main);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--ink);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
+      background-image: radial-gradient(var(--ink) 0.65px, transparent 0.65px);
+      background-size: 20px 20px;
     }
 
     .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
 
-    /* Header */
-    header {
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-subtle);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+    /* Neo-Brutalist Layout Shell */
+    .container {
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 16px;
     }
 
-    .nav-container {
-      max-width: 1160px;
-      margin: 0 auto;
-      padding: 0 24px;
-      height: 68px;
+    /* Neo-Brutalist Header */
+    header {
+      background: #FFFFFF;
+      border-bottom: var(--border-w) solid var(--ink);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      height: 72px;
     }
 
-    .nav-left {
+    .brand-logo {
       display: flex;
       align-items: center;
-      gap: 32px;
-    }
-
-    .logo-badge {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      gap: 10px;
       text-decoration: none;
-      color: var(--text-main);
+      color: var(--ink);
+      font-weight: 900;
+      font-size: 1.25rem;
+      letter-spacing: -0.03em;
     }
 
-    .excel-icon {
-      width: 34px;
-      height: 34px;
-      background: var(--excel-green);
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--excel);
       color: white;
+      border: var(--border-w) solid var(--ink);
+      box-shadow: 2.5px 2.5px 0px var(--ink);
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 16px;
-      box-shadow: 0 2px 4px rgba(16, 124, 65, 0.25);
+      font-weight: 900;
+      font-size: 1.1rem;
     }
 
-    .brand-name {
-      font-size: 1.15rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .nav-links {
+    .nav-menu {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 8px;
       list-style: none;
     }
 
-    .nav-link {
-      color: var(--text-muted);
+    .nav-item a {
+      display: inline-block;
       text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: var(--radius-sm);
-      transition: all 0.15s ease;
-    }
-
-    .nav-link:hover {
-      color: var(--text-main);
-      background: #F1F5F9;
-    }
-
-    .nav-link.active {
-      color: var(--excel-green);
-      background: var(--excel-light);
+      color: var(--ink);
       font-weight: 700;
+      font-size: 0.88rem;
+      padding: 8px 14px;
+      border: var(--border-w) solid transparent;
+      border-radius: var(--radius-sm);
+      transition: all 0.12s ease;
     }
 
-    .nav-right {
+    .nav-item a:hover {
+      background: var(--yellow);
+      border-color: var(--ink);
+      box-shadow: 2px 2px 0px var(--ink);
+      transform: translate(-1px, -1px);
+    }
+
+    .nav-item a.active {
+      background: var(--ink);
+      color: #FFFFFF;
+      border-color: var(--ink);
+      box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+    }
+
+    .nav-actions {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .btn-nav-maker {
-      background: var(--excel-green);
-      color: white;
+    .btn-brutal {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 0.9rem;
       text-decoration: none;
-      font-size: 0.88rem;
-      font-weight: 700;
       padding: 9px 18px;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      white-space: nowrap;
+    }
+
+    .btn-brutal:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-brutal:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--ink);
+    }
+
+    .btn-primary {
+      background: var(--excel);
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover {
+      background: var(--excel-hover);
+    }
+
+    .btn-secondary {
+      background: #FFFFFF;
+      color: var(--ink);
+    }
+
+    .btn-yellow {
+      background: var(--yellow);
+      color: var(--ink);
+    }
+
+    .btn-coral {
+      background: var(--coral);
+      color: #FFFFFF;
+    }
+
+    /* Mobile Hamburger */
+    .mobile-menu-toggle {
+      display: none;
+      background: #FFFFFF;
+      border: var(--border-w) solid var(--ink);
+      box-shadow: 2px 2px 0px var(--ink);
       border-radius: var(--radius-sm);
-      transition: all 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 2px 6px rgba(16, 124, 65, 0.2);
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 1.1rem;
     }
 
-    .btn-nav-maker:hover {
-      background: var(--excel-dark);
+    .mobile-drawer {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px;
+      background: #FFFFFF;
+      border-bottom: var(--border-w) solid var(--ink);
     }
 
-    .btn-nav-ref {
-      color: var(--text-main);
+    .mobile-drawer.open {
+      display: flex;
+    }
+
+    .mobile-drawer a {
       text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-strong);
-      background: white;
-      transition: all 0.15s ease;
+      color: var(--ink);
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 12px 16px;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--bg);
+      box-shadow: 3px 3px 0px var(--ink);
+    }
+
+    .mobile-drawer a.active {
+      background: var(--yellow);
+    }
+
+    /* Stickers & Eyebrows */
+    .sticker {
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      font-size: 0.76rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 4px 10px;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius-pill);
+      box-shadow: 2px 2px 0px var(--ink);
+      background: var(--yellow);
     }
 
-    .btn-nav-ref:hover {
-      background: #F8FAFC;
-      border-color: #94A3B8;
+    .sticker-excel { background: var(--excel-light); color: var(--excel); }
+    .sticker-ai { background: var(--purple-light); color: var(--purple); }
+    .sticker-blue { background: var(--blue-light); color: var(--blue); }
+
+    /* Neo-Brutal Cards */
+    .brutal-card {
+      background: var(--card-bg);
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      padding: 24px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .brutal-card:hover {
+      box-shadow: var(--shadow-lg);
     }
 
     /* Footer */
     footer {
       margin-top: auto;
-      border-top: 1px solid var(--border-subtle);
-      padding: 40px 24px;
-      background: white;
-      font-size: 0.85rem;
-      color: var(--text-muted);
+      background: #FFFFFF;
+      border-top: var(--border-w) solid var(--ink);
+      padding: 44px 16px 36px;
     }
 
-    .footer-container {
-      max-width: 1160px;
-      margin: 0 auto;
+    .footer-content {
       display: flex;
       flex-direction: column;
-      gap: 16px;
       align-items: center;
       text-align: center;
+      gap: 20px;
     }
 
-    .footer-nav {
+    .footer-links {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
+      gap: 12px 24px;
       list-style: none;
     }
 
-    .footer-nav a {
-      color: var(--text-muted);
+    .footer-links a {
       text-decoration: none;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.88rem;
+      border-bottom: 2px solid transparent;
+    }
+
+    .footer-links a:hover {
+      border-bottom-color: var(--ink);
+    }
+
+    .footer-bottom {
+      font-size: 0.82rem;
+      color: var(--muted);
       font-weight: 600;
     }
 
-    .footer-nav a:hover {
-      color: var(--excel-green);
+    /* Responsive Queries */
+    @media (max-width: 840px) {
+      .nav-menu { display: none; }
+      .mobile-menu-toggle { display: block; }
+      .nav-actions .btn-secondary { display: none; }
     }
 
-    @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .btn-nav-ref { display: none; }
+    @media (max-width: 480px) {
+      .btn-brutal { padding: 8px 14px; font-size: 0.84rem; }
+      .nav-actions { gap: 6px; }
     }
 
 
-    .tools-container {
-      max-width: 1040px;
+    .tools-wrap {
+      max-width: 960px;
       margin: 40px auto 80px;
-      padding: 0 24px;
     }
 
     .tools-header {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 44px;
     }
 
     .tools-title {
-      font-size: 2.4rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900;
+      letter-spacing: -0.035em;
       margin-bottom: 12px;
     }
 
     .tools-desc {
       font-size: 1.05rem;
-      color: var(--text-muted);
+      color: var(--muted);
+      max-width: 650px;
+      margin: 0 auto;
+      font-weight: 500;
     }
 
-    .tool-box {
-      background: white;
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-xl);
-      padding: 32px;
-      margin-bottom: 36px;
-      box-shadow: var(--shadow-md);
-    }
-
-    .tool-box h2 {
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: var(--text-main);
-      margin-bottom: 8px;
+    .tool-card {
+      background: #FFFFFF;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      padding: clamp(20px, 4vw, 32px);
+      margin-bottom: 32px;
       display: flex;
-      align-items: center;
-      gap: 10px;
+      flex-direction: column;
+      gap: 20px;
     }
 
-    .tool-box-desc {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-bottom: 22px;
-    }
-
-    /* Schema Inspector */
-    .inspector-dropzone {
-      border: 2px dashed #CBD5E1;
-      border-radius: var(--radius-md);
-      padding: 24px;
-      text-align: center;
-      background: #F8FAFC;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .inspector-dropzone input {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-    }
-
-    .inspector-result {
-      display: none;
-      margin-top: 20px;
-    }
-
-    .schema-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-      margin-top: 12px;
-    }
-
-    .schema-table th, .schema-table td {
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border-subtle);
-      text-align: left;
-    }
-
-    .schema-table th {
-      background: #F1F5F9;
-      font-weight: 700;
-      color: var(--text-main);
-    }
-
-    .badge-type {
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .badge-numeric { background: #DCFCE7; color: var(--forest); }
-    .badge-text { background: #EFF6FF; color: var(--navy); }
-
-    /* Formula Generator */
-    .calc-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .calc-field label {
-      display: block;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 6px;
-    }
-
-    .calc-field select, .calc-field input {
-      width: 100%;
-      padding: 9px 12px;
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      font-size: 0.9rem;
-      outline: none;
-    }
-
-    .formula-output-box {
-      background: #0F172A;
-      color: #34D399;
-      padding: 16px;
-      border-radius: var(--radius-md);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.92rem;
+    .tool-card-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
-    .copy-btn {
-      background: #1E293B;
-      color: #F8FAFC;
-      border: 1px solid #334155;
-      padding: 6px 12px;
+    .tool-name {
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    /* Schema Inspector Table */
+    .inspector-table-wrap {
+      overflow-x: auto;
+      border: var(--border-w) solid var(--ink);
       border-radius: var(--radius-sm);
-      cursor: pointer;
-      font-size: 0.8rem;
-      font-weight: 600;
+      display: none;
     }
 
-    .copy-btn:hover {
-      background: #334155;
+    .inspector-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    .inspector-table th, .inspector-table td {
+      padding: 12px 16px;
+      border-bottom: 2px solid var(--ink);
+      border-right: 2px solid var(--ink);
+    }
+
+    .inspector-table th {
+      background: var(--yellow-light);
+      font-weight: 900;
+    }
+
+    .inspector-table tr:last-child td { border-bottom: none; }
+    .inspector-table td:last-child, .inspector-table th:last-child { border-right: none; }
+
+    /* Formula Builder Form */
+    .builder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .form-group-tool {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group-tool label {
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    .select-tool, .input-tool {
+      width: 100%;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      background: #FFFFFF;
+      outline: none;
+    }
+
+    .formula-preview-box {
+      background: #1E293B;
+      color: #4ADE80;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
     }
   </style>
 </head>
 <body>
   
   <header>
-    <div class="nav-container">
-      <div class="nav-left">
-        <a href="index.html" class="logo-badge">
-          <div class="excel-icon">X</div>
-          <span class="brand-name font-display">ExcelFlow</span>
+    <div class="container">
+      <nav class="nav-bar">
+        <a href="index.html" class="brand-logo font-display">
+          <div class="brand-icon">X</div>
+          <span>ExcelFlow</span>
         </a>
 
-        <ul class="nav-links">
-          <li><a href="index.html" class="nav-link ">Home</a></li>
-          <li><a href="maker.html" class="nav-link ">Excel Maker Studio</a></li>
-          <li><a href="info.html" class="nav-link ">Architecture &amp; Docs</a></li>
-          <li><a href="tools.html" class="nav-link active">Data Utilities</a></li>
+        <ul class="nav-menu">
+          <li class="nav-item"><a href="index.html" class="">Home</a></li>
+          <li class="nav-item"><a href="maker.html" class="">Excel Maker Studio</a></li>
+          <li class="nav-item"><a href="info.html" class="">Tech Architecture</a></li>
+          <li class="nav-item"><a href="tools.html" class="active">Data Utilities</a></li>
         </ul>
-      </div>
 
-      <div class="nav-right">
-        <a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download class="btn-nav-ref">
-          <span>⬇️ Sample .xlsx</span>
-        </a>
-        <a href="maker.html" class="btn-nav-maker font-display">
-          <span>⚡ Launch Maker</span>
-        </a>
-      </div>
+        <div class="nav-actions">
+          <a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download class="btn-brutal btn-secondary font-display" title="Download Reference Workbook">
+            <span>⬇ Reference .xlsx</span>
+          </a>
+          <a href="maker.html" class="btn-brutal btn-primary font-display">
+            <span>⚡ Launch Studio</span>
+          </a>
+          <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Toggle navigation">☰</button>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-drawer" id="mobileDrawer">
+      <a href="index.html" class="">🏠 Home Landing</a>
+      <a href="maker.html" class="">⚡ Excel Maker Studio</a>
+      <a href="info.html" class="">📐 Tech Architecture &amp; Formulas</a>
+      <a href="tools.html" class="active">🛠️ Data &amp; Spreadsheet Utilities</a>
+      <a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download>⬇ Download Sample .xlsx Workbook</a>
     </div>
   </header>
 
 
-  <main class="tools-container">
+  <main class="container tools-wrap">
     <div class="tools-header">
-      <h1 class="tools-title font-display">Spreadsheet Data Utilities</h1>
-      <p class="tools-desc">Interactive tools to profile schemas, synthesize formulas, and convert datasets directly inside your browser.</p>
+      <div class="sticker sticker-blue" style="margin-bottom: 12px;">Spreadsheet Utilities</div>
+      <h1 class="tools-title font-display">Data &amp; Formula Utilities</h1>
+      <p class="tools-desc">Interactive browser-based tools for data profiling, formula construction, and table preparation.</p>
     </div>
 
-    <!-- Tool 1: Schema Inspector -->
-    <div class="tool-box">
-      <h2 class="font-display"><span>🔍</span> Dataset Schema Inspector</h2>
-      <p class="tool-box-desc">Drop any CSV or Excel file to instantly audit columns, data types, distinct counts, and detected measures without uploading to a server.</p>
-
-      <div class="inspector-dropzone" id="inspectDrop">
-        <input type="file" id="inspectInput" accept=".xlsx,.xls,.csv" />
-        <div>📂 <strong>Click or drop dataset file to inspect schema</strong> (CSV, XLSX)</div>
+    <!-- Tool 1: Dataset Schema Inspector -->
+    <div class="tool-card">
+      <div class="tool-card-head">
+        <h2 class="tool-name font-display">1. Dataset Schema &amp; Data Health Inspector</h2>
+        <span class="sticker sticker-excel">Instant Browser Profiling</span>
       </div>
+      <p style="font-size: 0.92rem; color: var(--muted); font-weight: 500;">
+        Upload any CSV or Excel file to instantly audit data types, unique cardinalities, null percentages, and measure classifications.
+      </p>
 
-      <div class="inspector-result" id="inspectResult">
-        <div id="inspectSummary" style="font-weight: 700; color: var(--navy); margin-top: 14px;"></div>
-        <table class="schema-table">
+      <label class="btn-brutal btn-secondary font-display" style="cursor: pointer; width: fit-content;">
+        <span>📂 Select CSV or XLSX to Inspect</span>
+        <input type="file" id="inspectInput" accept=".xlsx,.xls,.csv" style="display: none;" />
+      </label>
+
+      <div id="inspectorStats" style="display: none; font-weight: 800; font-size: 0.9rem; color: var(--excel);"></div>
+
+      <div class="inspector-table-wrap" id="inspectorTableWrap">
+        <table class="inspector-table" id="inspectorTable">
           <thead>
             <tr>
               <th>Column Name</th>
-              <th>Detected Type</th>
-              <th>Unique Values</th>
-              <th>Sample Values</th>
+              <th>Classification</th>
+              <th>Data Type</th>
+              <th>Unique Count</th>
+              <th>Sample Value</th>
             </tr>
           </thead>
-          <tbody id="inspectBody"></tbody>
+          <tbody id="inspectorTbody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Tool 2: Excel Formula Builder -->
-    <div class="tool-box">
-      <h2 class="font-display"><span>⚡</span> Interactive Formula Generator</h2>
-      <p class="tool-box-desc">Pick an institutional calculation pattern and inputs to generate clean, verified Microsoft Excel formula syntax ready to paste.</p>
+    <!-- Tool 2: Formula Builder -->
+    <div class="tool-card">
+      <div class="tool-card-head">
+        <h2 class="tool-name font-display">2. Structured Formula Builder</h2>
+        <span class="sticker">Real Excel Syntax</span>
+      </div>
+      <p style="font-size: 0.92rem; color: var(--muted); font-weight: 500;">
+        Build error-free, dynamic structured table formulas for Microsoft Excel.
+      </p>
 
-      <div class="calc-grid">
-        <div class="calc-field">
-          <label for="patternSelect">Formula Pattern</label>
-          <select id="patternSelect">
-            <option value="sumifs">SUMIFS (Multi-criteria Sum)</option>
-            <option value="xlookup">XLOOKUP (Modern Lookup)</option>
-            <option value="cagr">CAGR (Compound Growth)</option>
-            <option value="margin">Profit Margin %</option>
-            <option value="quota">Quota Tier (Nested IF)</option>
+      <div class="builder-grid">
+        <div class="form-group-tool">
+          <label for="fbFunc">Function</label>
+          <select id="fbFunc" class="select-tool">
+            <option value="SUMIFS">SUMIFS (Conditional Sum)</option>
+            <option value="AVERAGEIFS">AVERAGEIFS (Conditional Average)</option>
+            <option value="COUNTIFS">COUNTIFS (Conditional Count)</option>
           </select>
         </div>
-
-        <div class="calc-field">
-          <label for="param1">Metric Column / Value 1</label>
-          <input type="text" id="param1" value="Revenue" />
+        <div class="form-group-tool">
+          <label for="fbMetric">Metric Column</label>
+          <input type="text" id="fbMetric" class="input-tool" value="Revenue" />
         </div>
-
-        <div class="calc-field">
-          <label for="param2">Criteria / Value 2</label>
-          <input type="text" id="param2" value="Region" />
+        <div class="form-group-tool">
+          <label for="fbDim">Criteria Column</label>
+          <input type="text" id="fbDim" class="input-tool" value="Region" />
+        </div>
+        <div class="form-group-tool">
+          <label for="fbVal">Criteria Value</label>
+          <input type="text" id="fbVal" class="input-tool" value="North" />
         </div>
       </div>
 
-      <div class="formula-output-box">
-        <span id="formulaText">=SUMIFS(DataTable[Revenue], DataTable[Region], A2)</span>
-        <button class="copy-btn" id="copyBtn">Copy Formula</button>
+      <div class="formula-preview-box">
+        <span id="formulaResultText">=SUMIFS(DataTable[Revenue], DataTable[Region], "North")</span>
+        <button type="button" class="btn-brutal btn-yellow font-display" id="copyFormulaBtn" style="padding: 6px 14px; font-size: 0.8rem;">
+          Copy Formula
+        </button>
       </div>
     </div>
-
   </main>
 
   
   <footer>
-    <div class="footer-container">
-      <ul class="footer-nav">
+    <div class="container footer-content">
+      <div class="sticker sticker-excel">Institutional Spreadsheet Engine</div>
+      <ul class="footer-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="maker.html">Excel Maker Studio</a></li>
         <li><a href="info.html">Technical Architecture</a></li>
         <li><a href="tools.html">Data Utilities</a></li>
-        <li><a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download>Download Reference Workbook</a></li>
+        <li><a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download>Sample .xlsx</a></li>
       </ul>
-      <div><strong>ExcelFlow Platform</strong> — Institutional Client Data to Executive Excel Workbooks</div>
-      <div>100% Dynamic Formulas • Real Slicers &amp; Charts • Zero Hallucination Guarantee</div>
+      <div class="footer-bottom">
+        <strong>ExcelFlow Platform</strong> • 100% Dynamic Formulas • Real Slicers &amp; OpenXML Cache • Zero Hallucination Guarantee
+      </div>
     </div>
   </footer>
+  <script>
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    if (mobileBtn && mobileDrawer) {
+      mobileBtn.addEventListener('click', () => {
+        mobileDrawer.classList.toggle('open');
+      });
+    }
+  </script>
 
 
   <script>
-    // Schema Inspector Logic
+    // Tool 1 Inspector
     const inspectInput = document.getElementById('inspectInput');
-    const inspectResult = document.getElementById('inspectResult');
-    const inspectSummary = document.getElementById('inspectSummary');
-    const inspectBody = document.getElementById('inspectBody');
+    const inspectorStats = document.getElementById('inspectorStats');
+    const inspectorTableWrap = document.getElementById('inspectorTableWrap');
+    const inspectorTbody = document.getElementById('inspectorTbody');
 
     inspectInput.addEventListener('change', (e) => {
       if (e.target.files && e.target.files.length > 0) {
@@ -512,76 +628,71 @@
             const wb = XLSX.read(data, {type: 'array'});
             const sheet = wb.Sheets[wb.SheetNames[0]];
             const raw = XLSX.utils.sheet_to_json(sheet, {header: 1, defval: ""});
-            if (raw.length < 2) return;
+            if (!raw || raw.length < 2) return;
 
-            const headers = raw[0];
-            const rows = raw.slice(1);
-            inspectSummary.textContent = `Audited: ${file.name} • ${rows.length} Records • ${headers.length} Columns`;
+            const headers = raw[0].map(h => String(h).trim());
+            const rows = raw.slice(1).filter(r => r.some(c => c !== ""));
 
-            inspectBody.innerHTML = "";
-            headers.forEach((h, colIdx) => {
+            inspectorStats.textContent = `Audited: ${file.name} • ${rows.length} Rows • ${headers.length} Columns`;
+            inspectorStats.style.display = 'block';
+
+            inspectorTbody.innerHTML = '';
+            headers.forEach((h, idx) => {
               let numCount = 0;
               const vals = [];
               rows.forEach(r => {
-                const v = r[colIdx];
+                const v = r[idx];
                 if (v !== "" && !isNaN(Number(v))) numCount++;
                 if (v !== "") vals.push(String(v));
               });
               const isNum = numCount >= rows.length * 0.6;
-              const uniques = Array.from(new Set(vals));
-
+              const uniqueCount = new Set(vals).size;
               const tr = document.createElement('tr');
               tr.innerHTML = `
                 <td><strong>${h}</strong></td>
-                <td><span class="badge-type ${isNum ? 'badge-numeric' : 'badge-text'}">${isNum ? 'Numeric Measure' : 'Categorical Dimension'}</span></td>
-                <td>${uniques.length}</td>
-                <td><small style="color: #64748B;">${uniques.slice(0, 3).join(', ')}</small></td>
+                <td><span class="sticker ${isNum ? 'sticker-excel' : 'sticker-blue'}" style="font-size: 0.72rem;">${isNum ? 'MEASURE' : 'DIMENSION'}</span></td>
+                <td>${isNum ? 'Numeric / Float' : 'String / Categorical'}</td>
+                <td>${uniqueCount} unique</td>
+                <td>${vals[0] || 'N/A'}</td>
               `;
-              inspectBody.appendChild(tr);
+              inspectorTbody.appendChild(tr);
             });
-
-            inspectResult.style.display = 'block';
+            inspectorTableWrap.style.display = 'block';
           } catch (err) {
-            alert("Error reading file: " + err.message);
+            alert('Error profiling file: ' + err.message);
           }
         };
         reader.readAsArrayBuffer(file);
       }
     });
 
-    // Formula Generator Logic
-    const patternSelect = document.getElementById('patternSelect');
-    const param1 = document.getElementById('param1');
-    const param2 = document.getElementById('param2');
-    const formulaText = document.getElementById('formulaText');
-    const copyBtn = document.getElementById('copyBtn');
+    // Tool 2 Formula Builder
+    const fbFunc = document.getElementById('fbFunc');
+    const fbMetric = document.getElementById('fbMetric');
+    const fbDim = document.getElementById('fbDim');
+    const fbVal = document.getElementById('fbVal');
+    const formulaResultText = document.getElementById('formulaResultText');
+    const copyFormulaBtn = document.getElementById('copyFormulaBtn');
 
     function updateFormula() {
-      const pat = patternSelect.value;
-      const p1 = param1.value.trim() || "Value1";
-      const p2 = param2.value.trim() || "Value2";
+      const fn = fbFunc.value;
+      const m = fbMetric.value.trim() || 'Metric';
+      const d = fbDim.value.trim() || 'Dimension';
+      const v = fbVal.value.trim() || 'Value';
 
-      if (pat === "sumifs") {
-        formulaText.textContent = `=SUMIFS(DataTable[${p1}], DataTable[${p2}], A2)`;
-      } else if (pat === "xlookup") {
-        formulaText.textContent = `=XLOOKUP(A2, DataTable[${p1}], DataTable[${p2}], "Not Found")`;
-      } else if (pat === "cagr") {
-        formulaText.textContent = `=(DataTable[${p1}] / DataTable[${p2}]) ^ (1 / 3) - 1`;
-      } else if (pat === "margin") {
-        formulaText.textContent = `=(DataTable[${p1}] - DataTable[${p2}]) / DataTable[${p1}]`;
-      } else if (pat === "quota") {
-        formulaText.textContent = `=IF(DataTable[${p1}]>=1000, "Top Performer", IF(DataTable[${p1}]>=800, "Exceeded", "Met"))`;
+      if (fn === 'COUNTIFS') {
+        formulaResultText.textContent = `=COUNTIFS(DataTable[${d}], "${v}")`;
+      } else {
+        formulaResultText.textContent = `=${fn}(DataTable[${m}], DataTable[${d}], "${v}")`;
       }
     }
 
-    patternSelect.addEventListener('change', updateFormula);
-    param1.addEventListener('input', updateFormula);
-    param2.addEventListener('input', updateFormula);
+    [fbFunc, fbMetric, fbDim, fbVal].forEach(el => el.addEventListener('input', updateFormula));
 
-    copyBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText(formulaText.textContent);
-      copyBtn.textContent = "Copied! ✓";
-      setTimeout(() => copyBtn.textContent = "Copy Formula", 2000);
+    copyFormulaBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(formulaResultText.textContent);
+      copyFormulaBtn.textContent = "Copied! ✓";
+      setTimeout(() => copyFormulaBtn.textContent = "Copy Formula", 2000);
     });
   </script>
 </body>

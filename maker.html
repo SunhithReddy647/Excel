@@ -3,294 +3,392 @@
 <head>
   
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <title>Excel Maker Studio — ExcelFlow</title>
-  <meta name="description" content="Ingest any client dataset (CSV, XLSX) to compile a fully functional, zero-hallucination Microsoft Excel executive dashboard.">
+  <meta name="description" content="AI-powered executive Excel dashboard studio. Upload CSV/XLSX, type business questions, and download a zero-hallucination workbook with dynamic formulas and slicers.">
   <style>
     
     :root {
-      --bg: #F8FAFC;
+      --bg: #FBF8F3;
+      --bg-alt: #F3EFE6;
+      --ink: #0A0A0A;
       --card-bg: #FFFFFF;
-      --text-main: #0F172A;
-      --text-muted: #64748B;
-      --border-subtle: #E2E8F0;
-      --border-strong: #CBD5E1;
-      --excel-green: #107C41;
-      --excel-dark: #0D6535;
+      --excel: #107C41;
+      --excel-hover: #0D6535;
       --excel-light: #EBF7EE;
-      --navy: #1E3A8A;
-      --navy-light: #EFF6FF;
-      --forest: #166534;
-      --amber: #B45309;
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 14px;
-      --radius-xl: 20px;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      --yellow: #FFE600;
+      --yellow-light: #FFFBE6;
+      --blue: #2563EB;
+      --blue-light: #EFF6FF;
+      --coral: #FF5A5F;
+      --coral-light: #FFF1F2;
+      --purple: #8B5CF6;
+      --purple-light: #F5F3FF;
+      --muted: #525252;
+      --border-w: 2.5px;
+      --radius: 8px;
+      --radius-sm: 5px;
+      --radius-pill: 9999px;
+      --shadow-sm: 2px 2px 0px var(--ink);
+      --shadow-md: 4px 4px 0px var(--ink);
+      --shadow-lg: 6px 6px 0px var(--ink);
+      --shadow-xl: 8px 8px 0px var(--ink);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     body {
       background-color: var(--bg);
-      color: var(--text-main);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--ink);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
+      background-image: radial-gradient(var(--ink) 0.65px, transparent 0.65px);
+      background-size: 20px 20px;
     }
 
     .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
 
-    /* Header */
-    header {
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-subtle);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+    /* Neo-Brutalist Layout Shell */
+    .container {
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 16px;
     }
 
-    .nav-container {
-      max-width: 1160px;
-      margin: 0 auto;
-      padding: 0 24px;
-      height: 68px;
+    /* Neo-Brutalist Header */
+    header {
+      background: #FFFFFF;
+      border-bottom: var(--border-w) solid var(--ink);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      height: 72px;
     }
 
-    .nav-left {
+    .brand-logo {
       display: flex;
       align-items: center;
-      gap: 32px;
-    }
-
-    .logo-badge {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      gap: 10px;
       text-decoration: none;
-      color: var(--text-main);
+      color: var(--ink);
+      font-weight: 900;
+      font-size: 1.25rem;
+      letter-spacing: -0.03em;
     }
 
-    .excel-icon {
-      width: 34px;
-      height: 34px;
-      background: var(--excel-green);
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--excel);
       color: white;
+      border: var(--border-w) solid var(--ink);
+      box-shadow: 2.5px 2.5px 0px var(--ink);
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 16px;
-      box-shadow: 0 2px 4px rgba(16, 124, 65, 0.25);
+      font-weight: 900;
+      font-size: 1.1rem;
     }
 
-    .brand-name {
-      font-size: 1.15rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .nav-links {
+    .nav-menu {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 8px;
       list-style: none;
     }
 
-    .nav-link {
-      color: var(--text-muted);
+    .nav-item a {
+      display: inline-block;
       text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: var(--radius-sm);
-      transition: all 0.15s ease;
-    }
-
-    .nav-link:hover {
-      color: var(--text-main);
-      background: #F1F5F9;
-    }
-
-    .nav-link.active {
-      color: var(--excel-green);
-      background: var(--excel-light);
+      color: var(--ink);
       font-weight: 700;
+      font-size: 0.88rem;
+      padding: 8px 14px;
+      border: var(--border-w) solid transparent;
+      border-radius: var(--radius-sm);
+      transition: all 0.12s ease;
     }
 
-    .nav-right {
+    .nav-item a:hover {
+      background: var(--yellow);
+      border-color: var(--ink);
+      box-shadow: 2px 2px 0px var(--ink);
+      transform: translate(-1px, -1px);
+    }
+
+    .nav-item a.active {
+      background: var(--ink);
+      color: #FFFFFF;
+      border-color: var(--ink);
+      box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+    }
+
+    .nav-actions {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .btn-nav-maker {
-      background: var(--excel-green);
-      color: white;
+    .btn-brutal {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 0.9rem;
       text-decoration: none;
-      font-size: 0.88rem;
-      font-weight: 700;
       padding: 9px 18px;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      white-space: nowrap;
+    }
+
+    .btn-brutal:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-brutal:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--ink);
+    }
+
+    .btn-primary {
+      background: var(--excel);
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover {
+      background: var(--excel-hover);
+    }
+
+    .btn-secondary {
+      background: #FFFFFF;
+      color: var(--ink);
+    }
+
+    .btn-yellow {
+      background: var(--yellow);
+      color: var(--ink);
+    }
+
+    .btn-coral {
+      background: var(--coral);
+      color: #FFFFFF;
+    }
+
+    /* Mobile Hamburger */
+    .mobile-menu-toggle {
+      display: none;
+      background: #FFFFFF;
+      border: var(--border-w) solid var(--ink);
+      box-shadow: 2px 2px 0px var(--ink);
       border-radius: var(--radius-sm);
-      transition: all 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 2px 6px rgba(16, 124, 65, 0.2);
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 1.1rem;
     }
 
-    .btn-nav-maker:hover {
-      background: var(--excel-dark);
+    .mobile-drawer {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px;
+      background: #FFFFFF;
+      border-bottom: var(--border-w) solid var(--ink);
     }
 
-    .btn-nav-ref {
-      color: var(--text-main);
+    .mobile-drawer.open {
+      display: flex;
+    }
+
+    .mobile-drawer a {
       text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-strong);
-      background: white;
-      transition: all 0.15s ease;
+      color: var(--ink);
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 12px 16px;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--bg);
+      box-shadow: 3px 3px 0px var(--ink);
+    }
+
+    .mobile-drawer a.active {
+      background: var(--yellow);
+    }
+
+    /* Stickers & Eyebrows */
+    .sticker {
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      font-size: 0.76rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 4px 10px;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius-pill);
+      box-shadow: 2px 2px 0px var(--ink);
+      background: var(--yellow);
     }
 
-    .btn-nav-ref:hover {
-      background: #F8FAFC;
-      border-color: #94A3B8;
+    .sticker-excel { background: var(--excel-light); color: var(--excel); }
+    .sticker-ai { background: var(--purple-light); color: var(--purple); }
+    .sticker-blue { background: var(--blue-light); color: var(--blue); }
+
+    /* Neo-Brutal Cards */
+    .brutal-card {
+      background: var(--card-bg);
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      padding: 24px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .brutal-card:hover {
+      box-shadow: var(--shadow-lg);
     }
 
     /* Footer */
     footer {
       margin-top: auto;
-      border-top: 1px solid var(--border-subtle);
-      padding: 40px 24px;
-      background: white;
-      font-size: 0.85rem;
-      color: var(--text-muted);
+      background: #FFFFFF;
+      border-top: var(--border-w) solid var(--ink);
+      padding: 44px 16px 36px;
     }
 
-    .footer-container {
-      max-width: 1160px;
-      margin: 0 auto;
+    .footer-content {
       display: flex;
       flex-direction: column;
-      gap: 16px;
       align-items: center;
       text-align: center;
+      gap: 20px;
     }
 
-    .footer-nav {
+    .footer-links {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
+      gap: 12px 24px;
       list-style: none;
     }
 
-    .footer-nav a {
-      color: var(--text-muted);
+    .footer-links a {
       text-decoration: none;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.88rem;
+      border-bottom: 2px solid transparent;
+    }
+
+    .footer-links a:hover {
+      border-bottom-color: var(--ink);
+    }
+
+    .footer-bottom {
+      font-size: 0.82rem;
+      color: var(--muted);
       font-weight: 600;
     }
 
-    .footer-nav a:hover {
-      color: var(--excel-green);
+    /* Responsive Queries */
+    @media (max-width: 840px) {
+      .nav-menu { display: none; }
+      .mobile-menu-toggle { display: block; }
+      .nav-actions .btn-secondary { display: none; }
     }
 
-    @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .btn-nav-ref { display: none; }
+    @media (max-width: 480px) {
+      .btn-brutal { padding: 8px 14px; font-size: 0.84rem; }
+      .nav-actions { gap: 6px; }
     }
 
 
-    /* Maker Specific Styles */
-    .maker-header-area {
-      padding: 40px 24px 20px;
+    /* Maker Studio Layout */
+    .maker-wrap {
+      max-width: 860px;
+      margin: 36px auto 70px;
+    }
+
+    .maker-header {
       text-align: center;
-      max-width: 800px;
-      margin: 0 auto;
+      margin-bottom: 32px;
     }
 
     .maker-title {
-      font-size: 2.4rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 12px;
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 900;
+      letter-spacing: -0.035em;
+      margin-bottom: 10px;
     }
 
     .maker-desc {
       font-size: 1.05rem;
-      color: var(--text-muted);
+      color: var(--muted);
+      max-width: 650px;
+      margin: 0 auto;
+      font-weight: 500;
     }
 
-    .maker-console-wrap {
-      max-width: 820px;
-      margin: 0 auto 60px;
-      padding: 0 20px;
-      width: 100%;
+    /* Cards Stack */
+    .console-card {
+      background: #FFFFFF;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      padding: clamp(20px, 4vw, 36px);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
     }
 
-    .maker-card {
-      background: white;
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-xl);
-      padding: 36px;
-      box-shadow: var(--shadow-xl);
-    }
-
+    /* Dropzone */
     .dropzone {
-      border: 2px dashed #CBD5E1;
-      border-radius: var(--radius-lg);
-      padding: 36px 24px;
+      border: 3px dashed var(--ink);
+      border-radius: var(--radius);
+      padding: clamp(28px, 5vw, 44px) 20px;
       text-align: center;
-      background: #F8FAFC;
+      background: var(--bg);
       cursor: pointer;
-      transition: all 0.2s ease;
       position: relative;
+      transition: all 0.15s ease;
     }
 
     .dropzone:hover, .dropzone.drag-over {
-      border-color: var(--excel-green);
-      background: var(--excel-light);
-    }
-
-    .dropzone-icon {
-      font-size: 2.6rem;
-      margin-bottom: 12px;
-      display: inline-block;
-    }
-
-    .dropzone-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 6px;
-    }
-
-    .dropzone-subtitle {
-      font-size: 0.85rem;
-      color: var(--text-muted);
+      background: var(--yellow-light);
+      border-color: var(--ink);
+      box-shadow: 4px 4px 0px var(--ink);
+      transform: translate(-1px, -1px);
     }
 
     .dropzone input[type="file"] {
@@ -302,472 +400,626 @@
       height: 100%;
     }
 
-    .file-loaded-banner {
+    .dropzone-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    .dropzone-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .dropzone-sub {
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* File Banner */
+    .file-banner {
       display: none;
       align-items: center;
       justify-content: space-between;
-      background: #EFF6FF;
-      border: 1px solid #BFDBFE;
-      padding: 14px 18px;
-      border-radius: var(--radius-md);
-      margin-top: 18px;
+      background: var(--blue-light);
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
     }
 
-    .file-info-group {
+    .file-left {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .file-icon { font-size: 1.6rem; }
-    .file-name { font-weight: 700; font-size: 0.95rem; color: var(--navy); }
-    .file-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
-
-    .remove-file-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 1.2rem;
-      padding: 4px;
-      line-height: 1;
-    }
-
-    .remove-file-btn:hover { color: #EF4444; }
-
-    .sample-section { margin-top: 24px; }
-    .sample-label {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    .sample-chips {
+    .file-icon-badge {
+      width: 44px;
+      height: 44px;
+      background: var(--excel);
+      color: white;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius-sm);
       display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 900;
+    }
+
+    .file-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .file-name {
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .file-stats {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .btn-remove-file {
+      background: #FFFFFF;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius-sm);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 900;
+      color: var(--coral);
+      box-shadow: 2px 2px 0px var(--ink);
+      transition: transform 0.1s;
+    }
+
+    .btn-remove-file:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--ink);
+    }
+
+    /* Question & Objective Block */
+    .question-card {
+      background: var(--bg);
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .question-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    .sample-chip {
-      background: #F1F5F9;
-      border: 1px solid var(--border-subtle);
-      border-radius: 9999px;
-      padding: 6px 14px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-main);
-      cursor: pointer;
-      transition: all 0.15s ease;
-      display: inline-flex;
+    .question-lbl {
+      font-weight: 800;
+      font-size: 0.95rem;
+      display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
-    .sample-chip:hover {
-      background: #E2E8F0;
-      border-color: #94A3B8;
-    }
-
-    .sample-chip.active {
-      background: var(--navy-light);
-      border-color: #93C5FD;
-      color: var(--navy);
-      font-weight: 700;
-    }
-
-    .form-group { margin-top: 22px; }
-    .form-label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 8px;
-    }
-
-    .form-input {
+    .question-input {
       width: 100%;
-      padding: 11px 16px;
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-md);
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
       font-family: inherit;
       font-size: 0.92rem;
-      color: var(--text-main);
-      background: #FFFFFF;
+      font-weight: 600;
       outline: none;
-      transition: border-color 0.2s;
+      resize: vertical;
+      background: #FFFFFF;
+      transition: box-shadow 0.15s ease;
+      line-height: 1.5;
     }
 
-    .form-input:focus {
-      border-color: var(--excel-green);
-      box-shadow: 0 0 0 3px rgba(16, 124, 65, 0.12);
+    .question-input:focus {
+      box-shadow: 3px 3px 0px var(--ink);
+    }
+
+    /* Quick Question Chips */
+    .chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .chips-label {
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--muted);
     }
 
     .q-chip {
-      background: white;
-      border: 1px solid var(--border-strong);
-      border-radius: 9999px;
+      background: #FFFFFF;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius-pill);
       padding: 5px 12px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ink);
       cursor: pointer;
-      transition: all 0.15s ease;
+      box-shadow: 2px 2px 0px var(--ink);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
     }
 
     .q-chip:hover {
-      background: var(--excel-light);
-      border-color: #C6E7D1;
-      color: var(--excel-dark);
-      transform: translateY(-1px);
+      background: var(--yellow);
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--ink);
     }
 
-    .btn-build {
-      background: var(--excel-green);
-      color: white;
-      border: none;
-      border-radius: var(--radius-md);
-      padding: 15px 24px;
-      font-size: 1.05rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: 0 4px 10px rgba(16, 124, 65, 0.25);
-      transition: all 0.2s ease;
-      width: 100%;
-      margin-top: 24px;
-    }
-
-    .btn-build:hover:not(:disabled) {
-      background: var(--excel-dark);
-      transform: translateY(-1px);
-    }
-
-    .btn-build:disabled { opacity: 0.65; cursor: not-allowed; }
-
-    /* Progress Stepper */
-    .progress-panel {
-      display: none;
-      margin-top: 28px;
-      border-top: 1px solid var(--border-subtle);
-      padding-top: 24px;
-    }
-
-    .progress-header {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .steps-list {
+    /* Sample Datasets Row */
+    .samples-wrap {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .step-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .step-item.active {
-      color: var(--excel-green);
-      font-weight: 600;
-    }
-
-    .step-item.done { color: var(--forest); }
-
-    .step-icon {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: 2px solid var(--border-strong);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      flex-shrink: 0;
-    }
-
-    .step-item.active .step-icon {
-      border-color: var(--excel-green);
-      background: var(--excel-light);
-      color: var(--excel-green);
-    }
-
-    .step-item.done .step-icon {
-      border-color: var(--forest);
-      background: var(--forest);
-      color: white;
-    }
-
-    /* Download Result Card */
-    .download-result-card {
-      display: none;
-      margin-top: 28px;
-      background: #F0FDF4;
-      border: 1px solid #BBF7D0;
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      text-align: center;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .success-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--forest);
+    .samples-title {
+      font-size: 0.82rem;
       font-weight: 800;
-      font-size: 1.15rem;
-      margin-bottom: 6px;
-    }
-
-    .result-desc {
-      font-size: 0.88rem;
-      color: #166534;
-      margin-bottom: 20px;
-    }
-
-    .result-metrics {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 10px;
-      margin-bottom: 24px;
-      text-align: left;
-    }
-
-    .metric-box {
-      background: white;
-      border: 1px solid #DCFCE7;
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-    }
-
-    .metric-box-label {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--text-muted);
       text-transform: uppercase;
+      color: var(--muted);
       letter-spacing: 0.04em;
     }
 
-    .metric-box-val {
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: var(--text-main);
-      margin-top: 2px;
+    .sample-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .btn-download-final {
-      background: var(--excel-green);
-      color: white;
-      text-decoration: none;
-      border-radius: var(--radius-md);
-      padding: 14px 28px;
-      font-size: 1.05rem;
+    .btn-sample {
+      background: #FFFFFF;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      padding: 8px 16px;
+      font-size: 0.86rem;
       font-weight: 700;
+      cursor: pointer;
+      box-shadow: 2.5px 2.5px 0px var(--ink);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.1s ease;
+    }
+
+    .btn-sample:hover {
+      background: var(--bg-alt);
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px var(--ink);
+    }
+
+    .btn-sample.active {
+      background: var(--yellow);
+      box-shadow: 4px 4px 0px var(--ink);
+      transform: translate(-1px, -1px);
+    }
+
+    /* Title Input */
+    .title-field-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .title-input {
+      width: 100%;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      outline: none;
+      background: #FFFFFF;
+    }
+
+    .title-input:focus {
+      box-shadow: 3px 3px 0px var(--ink);
+    }
+
+    /* Build Button */
+    .btn-execute {
+      background: var(--excel);
+      color: #FFFFFF;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      padding: 16px 28px;
+      font-size: 1.15rem;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.12s ease;
+    }
+
+    .btn-execute:hover:not(:disabled) {
+      background: var(--excel-hover);
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .btn-execute:active:not(:disabled) {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--ink);
+    }
+
+    .btn-execute:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Stepper Panel */
+    .stepper-panel {
+      display: none;
+      background: #FFFFFF;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      margin-top: 10px;
+    }
+
+    .stepper-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+      border-bottom: 2px solid var(--bg-alt);
+      padding-bottom: 12px;
+    }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .step-node {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.85rem;
+      background: #FFFFFF;
+      color: var(--ink);
+      box-shadow: 2px 2px 0px var(--ink);
+    }
+
+    .step-node.active {
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .step-node.active .step-num {
+      background: var(--yellow);
+    }
+
+    .step-node.done {
+      color: var(--excel);
+    }
+
+    .step-node.done .step-num {
+      background: var(--excel);
+      color: #FFFFFF;
+    }
+
+    /* Success Card */
+    .success-card {
+      display: none;
+      background: var(--yellow-light);
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-xl);
+      padding: clamp(24px, 5vw, 36px);
+      text-align: center;
+      margin-top: 16px;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .success-badge {
+      display: inline-block;
+      background: var(--excel);
+      color: #FFFFFF;
+      border: var(--border-w) solid var(--ink);
+      padding: 6px 18px;
+      border-radius: var(--radius-pill);
+      font-weight: 900;
+      font-size: 0.95rem;
+      box-shadow: 3px 3px 0px var(--ink);
+      margin: 0 auto;
+    }
+
+    .ai-briefing-box {
+      background: #FFFFFF;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      text-align: left;
+      box-shadow: var(--shadow-sm);
+      font-size: 0.92rem;
+      line-height: 1.6;
+      font-weight: 600;
+    }
+
+    .result-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .metric-cell {
+      background: #FFFFFF;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      box-shadow: 2px 2px 0px var(--ink);
+      text-align: center;
+    }
+
+    .metric-lbl {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .metric-val {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    .btn-download-now {
+      background: var(--excel);
+      color: #FFFFFF;
+      font-size: 1.15rem;
+      padding: 16px 32px;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      cursor: pointer;
+      font-weight: 900;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      box-shadow: 0 4px 12px rgba(16, 124, 65, 0.3);
-      cursor: pointer;
-      border: none;
+      transition: all 0.1s ease;
       width: 100%;
     }
 
-    .btn-download-final:hover { background: var(--excel-dark); }
+    .btn-download-now:hover {
+      background: var(--excel-hover);
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-xl);
+    }
   </style>
 </head>
 <body>
   
   <header>
-    <div class="nav-container">
-      <div class="nav-left">
-        <a href="index.html" class="logo-badge">
-          <div class="excel-icon">X</div>
-          <span class="brand-name font-display">ExcelFlow</span>
+    <div class="container">
+      <nav class="nav-bar">
+        <a href="index.html" class="brand-logo font-display">
+          <div class="brand-icon">X</div>
+          <span>ExcelFlow</span>
         </a>
 
-        <ul class="nav-links">
-          <li><a href="index.html" class="nav-link ">Home</a></li>
-          <li><a href="maker.html" class="nav-link active">Excel Maker Studio</a></li>
-          <li><a href="info.html" class="nav-link ">Architecture &amp; Docs</a></li>
-          <li><a href="tools.html" class="nav-link ">Data Utilities</a></li>
+        <ul class="nav-menu">
+          <li class="nav-item"><a href="index.html" class="">Home</a></li>
+          <li class="nav-item"><a href="maker.html" class="active">Excel Maker Studio</a></li>
+          <li class="nav-item"><a href="info.html" class="">Tech Architecture</a></li>
+          <li class="nav-item"><a href="tools.html" class="">Data Utilities</a></li>
         </ul>
-      </div>
 
-      <div class="nav-right">
-        <a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download class="btn-nav-ref">
-          <span>⬇️ Sample .xlsx</span>
-        </a>
-        <a href="maker.html" class="btn-nav-maker font-display">
-          <span>⚡ Launch Maker</span>
-        </a>
-      </div>
+        <div class="nav-actions">
+          <a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download class="btn-brutal btn-secondary font-display" title="Download Reference Workbook">
+            <span>⬇ Reference .xlsx</span>
+          </a>
+          <a href="maker.html" class="btn-brutal btn-primary font-display">
+            <span>⚡ Launch Studio</span>
+          </a>
+          <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Toggle navigation">☰</button>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-drawer" id="mobileDrawer">
+      <a href="index.html" class="">🏠 Home Landing</a>
+      <a href="maker.html" class="active">⚡ Excel Maker Studio</a>
+      <a href="info.html" class="">📐 Tech Architecture &amp; Formulas</a>
+      <a href="tools.html" class="">🛠️ Data &amp; Spreadsheet Utilities</a>
+      <a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download>⬇ Download Sample .xlsx Workbook</a>
     </div>
   </header>
 
 
-  <section class="maker-header-area">
-    <h1 class="maker-title font-display">Excel Maker Dashboard Studio</h1>
-    <p class="maker-desc">Drop your client dataset to automatically assemble an executive Microsoft Excel dashboard with genuine formulas, breakdown tables, and interactive slicers.</p>
-  </section>
+  <main class="container maker-wrap">
+    <div class="maker-header">
+      <div class="sticker sticker-ai" style="margin-bottom: 12px;">✨ Gemini 3.6 Flash Synthesis Engine</div>
+      <h1 class="maker-title font-display">Excel Maker Dashboard Studio</h1>
+      <p class="maker-desc">Ingest raw client data and specific business questions to compile an authentic Microsoft Excel dashboard with genuine dynamic formulas and slicers.</p>
+    </div>
 
-  <main class="maker-console-wrap">
-    <div class="maker-card">
-
-      <!-- File Dropzone -->
-      <div class="dropzone" id="dropzone">
-        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
-        <div class="dropzone-icon">📁</div>
-        <div class="dropzone-title">Drop your client dataset here, or browse files</div>
-        <div class="dropzone-subtitle">Supports Microsoft Excel (.xlsx, .xls) and CSV datasets up to 25MB</div>
-      </div>
-
-      <!-- File Loaded Notification Banner -->
-      <div class="file-loaded-banner" id="fileBanner">
-        <div class="file-info-group">
-          <span class="file-icon">📊</span>
-          <div>
-            <div class="file-name" id="fileName">dataset.csv</div>
-            <div class="file-meta" id="fileMeta">Ready for processing</div>
-          </div>
+    <div class="console-card">
+      <!-- 1. File Upload Dropzone -->
+      <div>
+        <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 8px;">1. Client Dataset File (.xlsx, .csv)</div>
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
+          <div class="dropzone-icon">📂</div>
+          <div class="dropzone-title font-display">Drop client dataset here, or click to browse</div>
+          <div class="dropzone-sub">Supports Microsoft Excel (.xlsx, .xls) and CSV datasets up to 25MB</div>
         </div>
-        <button class="remove-file-btn" id="removeFileBtn" title="Remove file">✕</button>
-      </div>
 
-      <!-- 1-Click Sample Datasets -->
-      <div class="sample-section">
-        <span class="sample-label">Or test with verified sample datasets:</span>
-        <div class="sample-chips">
-          <button class="sample-chip" id="sampleSalesBtn">
-            <span>💼</span> Enterprise Regional Sales (48 records)
-          </button>
-          <button class="sample-chip" id="sampleFinanceBtn">
-            <span>📈</span> Corporate Budget &amp; Spend (120 records)
-          </button>
-          <button class="sample-chip" id="sampleOpsBtn">
-            <span>📦</span> Logistics &amp; Fulfillment (80 records)
-          </button>
+        <div class="file-banner" id="fileBanner">
+          <div class="file-left">
+            <div class="file-icon-badge">X</div>
+            <div class="file-details">
+              <span class="file-name" id="fileName">dataset.csv</span>
+              <span class="file-stats" id="fileMeta">Ready for analysis</span>
+            </div>
+          </div>
+          <button type="button" class="btn-remove-file" id="removeFileBtn" title="Remove file">✕</button>
         </div>
       </div>
 
       <!-- 2. AI Question & Business Objective -->
-      <div class="question-section" style="margin-top: 24px; background: #F8FAFC; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 22px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
-          <label class="form-label" style="margin-bottom: 0; display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.1rem;">✨</span> <strong>Client Question &amp; Business Objective</strong>
-            <span style="font-size: 0.76rem; background: var(--excel-light); color: var(--excel-dark); border: 1px solid #C6E7D1; padding: 2px 8px; border-radius: 9999px; font-weight: 700;">Gemini 3.6 Flash Active</span>
+      <div class="question-card">
+        <div class="question-top">
+          <label class="question-lbl" for="clientQuestion">
+            <span>✨</span> <strong>2. Client Questions &amp; Analysis Objectives</strong>
           </label>
-          <span style="font-size: 0.8rem; color: var(--text-muted);">AI synthesizes data against your exact question</span>
+          <span class="sticker sticker-ai" style="font-size: 0.72rem;">AI Binds to Exact Columns</span>
         </div>
-        <textarea id="clientQuestion" class="form-input" rows="3" style="resize: vertical; font-family: inherit; line-height: 1.5; font-size: 0.9rem;" placeholder="e.g., Create a sales executive dashboard comparing Revenue and Units across Regions, show monthly revenue trends, rank top products, and add slicers for Region and Month."></textarea>
+        <textarea id="clientQuestion" class="question-input" rows="3" placeholder="e.g., Create a sales executive dashboard comparing Revenue and Units across Regions, show monthly revenue trends, rank top products, and add slicers for Region and Month."></textarea>
 
-        <!-- Question Inspiration Chips -->
-        <div style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-          <span style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Quick Prompt:</span>
+        <div class="chips-row">
+          <span class="chips-label">Quick Prompts:</span>
           <button type="button" class="q-chip" data-q="Compare total Revenue and Units across Regions, show monthly revenue trends, rank top products, and add slicers for Region and Month.">💼 Regional Sales &amp; Trend</button>
           <button type="button" class="q-chip" data-q="Analyze Revenue, Cost, and Profit Margin across Product Categories, highlight top-performing departments, and add slicers.">📈 Profit &amp; Margin Breakdown</button>
           <button type="button" class="q-chip" data-q="Show average salary and headcount by Department, analyze performance ratings, and filter by Department and Status.">👥 Headcount &amp; Compensation</button>
           <button type="button" class="q-chip" data-q="Analyze inventory stock levels, warehouse fulfillment rates, and delivery performance over time.">📦 Supply Chain &amp; Inventory</button>
         </div>
 
-        <!-- Optional Question Document Upload -->
-        <div style="margin-top: 14px; display: flex; align-items: center; gap: 12px; border-top: 1px dashed var(--border-subtle); padding-top: 12px; flex-wrap: wrap;">
-          <label for="qFileInput" style="cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--navy); display: inline-flex; align-items: center; gap: 6px; background: white; border: 1px solid #BFDBFE; padding: 6px 14px; border-radius: var(--radius-sm); transition: all 0.15s ease;">
-            <span>📎 Attach Question Doc (.pdf, .docx, .txt, image)</span>
+        <div style="margin-top: 14px; display: flex; align-items: center; gap: 12px; border-top: 2px dashed var(--ink); padding-top: 12px; flex-wrap: wrap;">
+          <label for="qFileInput" class="btn-brutal btn-secondary" style="cursor: pointer; font-size: 0.82rem; padding: 6px 14px;">
+            <span>📎 Attach Question Doc (.pdf, .docx, .txt, img)</span>
             <input type="file" id="qFileInput" accept=".pdf,.docx,.txt,.png,.jpg,.jpeg,.webp" style="display: none;" />
           </label>
-          <div id="qFileBadge" style="display: none; align-items: center; gap: 8px; font-size: 0.82rem; background: #EFF6FF; border: 1px solid #BFDBFE; padding: 4px 12px; border-radius: var(--radius-sm); color: var(--navy); font-weight: 600;">
-            <span id="qFileNameText">file.pdf</span>
-            <button type="button" id="removeQFileBtn" style="border: none; background: none; cursor: pointer; color: #EF4444; font-size: 0.95rem; line-height: 1;" title="Remove file">✕</button>
+          <div id="qFileBadge" style="display: none; align-items: center; gap: 8px; font-size: 0.82rem; background: #FFFFFF; border: 2px solid var(--ink); padding: 5px 12px; border-radius: var(--radius-sm); font-weight: 700; box-shadow: 2px 2px 0px var(--ink);">
+            <span id="qFileNameText">question.pdf</span>
+            <button type="button" id="removeQFileBtn" style="border: none; background: none; cursor: pointer; color: var(--coral); font-weight: 900;">✕</button>
           </div>
         </div>
       </div>
 
-      <!-- Customization -->
-      <div class="form-group">
-        <label class="form-label" for="dashboardTitle">Dashboard Title (Optional)</label>
-        <input type="text" id="dashboardTitle" class="form-input" placeholder="e.g., Executive Q3 Regional Sales Dashboard" />
+      <!-- 3. Sample Datasets -->
+      <div class="samples-wrap">
+        <span class="samples-title">Or test with verified sample datasets:</span>
+        <div class="sample-btn-group">
+          <button type="button" class="btn-sample" id="sampleSalesBtn">
+            <span>💼</span> Regional Sales (48 records)
+          </button>
+          <button type="button" class="btn-sample" id="sampleFinanceBtn">
+            <span>📈</span> Budget &amp; Spend (120 records)
+          </button>
+          <button type="button" class="btn-sample" id="sampleOpsBtn">
+            <span>📦</span> Logistics &amp; Freight (80 records)
+          </button>
+        </div>
       </div>
 
-      <!-- Action Button -->
-      <button class="btn-build font-display" id="buildBtn">
+      <!-- 4. Title Input -->
+      <div class="title-field-wrap">
+        <label style="font-weight: 800; font-size: 0.92rem;" for="dashboardTitle">Dashboard Title (Optional)</label>
+        <input type="text" id="dashboardTitle" class="title-input" placeholder="e.g., Executive Q3 Regional Sales &amp; Margin Performance" />
+      </div>
+
+      <!-- Execute Button -->
+      <button type="button" class="btn-execute font-display" id="buildBtn">
         <span>⚡ Build Executive Excel Dashboard</span>
       </button>
 
-      <!-- Live Build Progress Stepper -->
-      <div class="progress-panel" id="progressPanel">
-        <div class="progress-header">
-          <span id="progressTitle">Architecting Workbook from Client Data...</span>
-          <span class="font-mono text-xs" id="progressPct">0%</span>
+      <!-- Stepper Panel -->
+      <div class="stepper-panel" id="progressPanel">
+        <div class="stepper-header">
+          <span id="progressTitle">Compiling Executive Workbook...</span>
+          <span class="font-mono" id="progressPct">0%</span>
         </div>
-        <div class="steps-list">
-          <div class="step-item" id="step1">
-            <span class="step-icon">1</span>
-            <span>Ingesting &amp; profiling client dataset schema...</span>
+        <div class="step-list">
+          <div class="step-node" id="step1">
+            <div class="step-num">1</div>
+            <span>Ingesting client dataset schema &amp; data types...</span>
           </div>
-          <div class="step-item" id="step2">
-            <span class="step-icon">2</span>
-            <span>Calculating measures &amp; dimension groupings...</span>
+          <div class="step-node" id="step2">
+            <div class="step-num">2</div>
+            <span>Gemini AI deeply analyzing dataset &amp; business questions...</span>
           </div>
-          <div class="step-item" id="step3">
-            <span class="step-icon">3</span>
-            <span>Generating dynamic formulas (=SUM, =SUMIFS) &amp; summary tables...</span>
+          <div class="step-node" id="step3">
+            <div class="step-num">3</div>
+            <span>Architecting tailored KPIs, multi-table breakdowns &amp; charts...</span>
           </div>
-          <div class="step-item" id="step4">
-            <span class="step-icon">4</span>
-            <span>Assembling Executive Dashboard &amp; pre-calculating cache...</span>
+          <div class="step-node" id="step4">
+            <div class="step-num">4</div>
+            <span>Compiling dynamic formulas (=SUMIFS, =AVERAGEIFS) &amp; OpenXML cache...</span>
           </div>
         </div>
       </div>
 
-      <!-- Download Ready State -->
-      <div class="download-result-card" id="downloadCard">
+      <!-- Success Card -->
+      <div class="success-card" id="downloadCard">
         <div class="success-badge">✓ Executive Excel Workbook Ready!</div>
-        <p class="result-desc" id="downloadDesc">100% functional workbook built directly from your client dataset.</p>
+        
+        <div class="ai-briefing-box" id="aiBriefingBox">
+          <div style="font-weight: 900; font-size: 0.8rem; text-transform: uppercase; color: var(--excel); margin-bottom: 4px;">AI Analysis Briefing:</div>
+          <div id="downloadDesc">100% genuine dashboard compiled from your data.</div>
+        </div>
 
-        <div class="result-metrics">
-          <div class="metric-box">
-            <div class="metric-box-label">Active Sheet</div>
-            <div class="metric-box-val" id="resSheet">Executive_Dashboard</div>
+        <div class="result-metrics-grid">
+          <div class="metric-cell">
+            <div class="metric-lbl">Active Sheet</div>
+            <div class="metric-val" id="resSheet">01_Executive</div>
           </div>
-          <div class="metric-box">
-            <div class="metric-box-label">Dynamic Formulas</div>
-            <div class="metric-box-val" id="resFormulas">100% Real</div>
+          <div class="metric-cell">
+            <div class="metric-lbl">Dynamic Formulas</div>
+            <div class="metric-val" id="resFormulas">100% Real</div>
           </div>
-          <div class="metric-box">
-            <div class="metric-box-label">Primary Metric</div>
-            <div class="metric-box-val" id="resMetric">Calculated</div>
+          <div class="metric-cell">
+            <div class="metric-lbl">Engine</div>
+            <div class="metric-val" id="resMetric">Gemini 3.6 Flash</div>
           </div>
-          <div class="metric-box">
-            <div class="metric-box-label">Client Records</div>
-            <div class="metric-box-val" id="resRecords">Formatted</div>
+          <div class="metric-cell">
+            <div class="metric-lbl">Client Records</div>
+            <div class="metric-val" id="resRecords">Formatted</div>
           </div>
         </div>
 
-        <button class="btn-download-final font-display" id="downloadFinalBtn">
-          <span>⬇️ Download .xlsx Dashboard</span>
+        <button type="button" class="btn-download-now font-display" id="downloadFinalBtn">
+          <span>⬇ Download .xlsx Dashboard</span>
         </button>
       </div>
 
@@ -776,18 +1028,29 @@
 
   
   <footer>
-    <div class="footer-container">
-      <ul class="footer-nav">
+    <div class="container footer-content">
+      <div class="sticker sticker-excel">Institutional Spreadsheet Engine</div>
+      <ul class="footer-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="maker.html">Excel Maker Studio</a></li>
         <li><a href="info.html">Technical Architecture</a></li>
         <li><a href="tools.html">Data Utilities</a></li>
-        <li><a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download>Download Reference Workbook</a></li>
+        <li><a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download>Sample .xlsx</a></li>
       </ul>
-      <div><strong>ExcelFlow Platform</strong> — Institutional Client Data to Executive Excel Workbooks</div>
-      <div>100% Dynamic Formulas • Real Slicers &amp; Charts • Zero Hallucination Guarantee</div>
+      <div class="footer-bottom">
+        <strong>ExcelFlow Platform</strong> • 100% Dynamic Formulas • Real Slicers &amp; OpenXML Cache • Zero Hallucination Guarantee
+      </div>
     </div>
   </footer>
+  <script>
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    if (mobileBtn && mobileDrawer) {
+      mobileBtn.addEventListener('click', () => {
+        mobileDrawer.classList.toggle('open');
+      });
+    }
+  </script>
 
 
   <script>
@@ -795,6 +1058,7 @@
       let parsedHeaders = [];
       let parsedRows = [];
       let currentFile = null;
+      let currentQuestionFile = null;
       let generatedWorkbookBlob = null;
       let outputFilename = "Executive_Dashboard.xlsx";
 
@@ -809,14 +1073,13 @@
       const sampleFinanceBtn = document.getElementById('sampleFinanceBtn');
       const sampleOpsBtn = document.getElementById('sampleOpsBtn');
 
-      const dashboardTitle = document.getElementById('dashboardTitle');
       const clientQuestion = document.getElementById('clientQuestion');
       const qFileInput = document.getElementById('qFileInput');
       const qFileBadge = document.getElementById('qFileBadge');
       const qFileNameText = document.getElementById('qFileNameText');
       const removeQFileBtn = document.getElementById('removeQFileBtn');
-      let currentQuestionFile = null;
 
+      const dashboardTitle = document.getElementById('dashboardTitle');
       const buildBtn = document.getElementById('buildBtn');
       const progressPanel = document.getElementById('progressPanel');
       const progressTitle = document.getElementById('progressTitle');
@@ -846,15 +1109,16 @@
         return letter;
       }
 
-      ['dragenter', 'dragover'].forEach(eventName => {
-        dropzone.addEventListener(eventName, (e) => {
+      // Drag and drop handlers
+      ['dragenter', 'dragover'].forEach(name => {
+        dropzone.addEventListener(name, (e) => {
           e.preventDefault();
           dropzone.classList.add('drag-over');
         });
       });
 
-      ['dragleave', 'drop'].forEach(eventName => {
-        dropzone.addEventListener(eventName, (e) => {
+      ['dragleave', 'drop'].forEach(name => {
+        dropzone.addEventListener(name, (e) => {
           e.preventDefault();
           dropzone.classList.remove('drag-over');
         });
@@ -881,7 +1145,7 @@
         downloadCard.style.display = 'none';
         [sampleSalesBtn, sampleFinanceBtn, sampleOpsBtn].forEach(b => b.classList.remove('active'));
 
-        const cleanName = file.name.replace(/\\.[^/.]+$/, "").replace(/[-_]/g, " ");
+        const cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
         if (!dashboardTitle.value) {
           dashboardTitle.value = "Executive " + cleanName.charAt(0).toUpperCase() + cleanName.slice(1) + " Dashboard";
         }
@@ -901,8 +1165,7 @@
 
             parsedHeaders = raw[0].map(h => String(h).trim());
             parsedRows = raw.slice(1).filter(r => r.some(c => c !== "" && c !== null && c !== undefined));
-
-            fileMeta.textContent = `${parsedRows.length} client records • ${parsedHeaders.length} columns • Ready to build`;
+            fileMeta.textContent = `${parsedRows.length} records • ${parsedHeaders.length} columns • Ready`;
           } catch (err) {
             fileMeta.textContent = "Error parsing file: " + err.message;
           }
@@ -920,80 +1183,7 @@
         downloadCard.style.display = 'none';
       });
 
-      sampleSalesBtn.addEventListener('click', () => loadSalesSample());
-      sampleFinanceBtn.addEventListener('click', () => loadFinanceSample());
-      sampleOpsBtn.addEventListener('click', () => loadOpsSample());
-
-      function loadSalesSample() {
-        dashboardTitle.value = "Executive Regional Sales Dashboard";
-        parsedHeaders = ["Order_ID", "Date", "Region", "Sales_Rep", "Product", "Units_Sold", "Unit_Price", "Revenue"];
-        parsedRows = [
-          [1001, "2026-01-05", "North", "David Miller", "Laptop Pro X", 24, 1200, 28800],
-          [1002, "2026-01-08", "South", "Emma Watson", "4K Ultra Monitor", 18, 450, 8100],
-          [1003, "2026-01-12", "East", "Michael Chang", "Cloud Storage Hub", 35, 300, 10500],
-          [1004, "2026-01-15", "West", "Sarah Jenkins", "Ergonomic Keypad", 50, 120, 6000],
-          [1005, "2026-01-20", "North", "David Miller", "4K Ultra Monitor", 22, 450, 9900],
-          [1006, "2026-01-25", "South", "Emma Watson", "Laptop Pro X", 30, 1200, 36000],
-          [1007, "2026-02-02", "East", "Michael Chang", "Laptop Pro X", 15, 1200, 18000],
-          [1008, "2026-02-07", "West", "Sarah Jenkins", "Cloud Storage Hub", 42, 300, 12600],
-          [1009, "2026-02-14", "North", "David Miller", "Ergonomic Keypad", 60, 120, 7200],
-          [1010, "2026-02-20", "South", "Emma Watson", "Cloud Storage Hub", 28, 300, 8400],
-          [1011, "2026-02-25", "East", "Michael Chang", "4K Ultra Monitor", 25, 450, 11250],
-          [1012, "2026-03-03", "West", "Sarah Jenkins", "Laptop Pro X", 20, 1200, 24000],
-          [1013, "2026-03-08", "North", "David Miller", "Laptop Pro X", 18, 1200, 21600],
-          [1014, "2026-03-15", "South", "Emma Watson", "Ergonomic Keypad", 45, 120, 5400],
-          [1015, "2026-03-22", "East", "Michael Chang", "Cloud Storage Hub", 30, 300, 9000],
-          [1016, "2026-03-29", "West", "Sarah Jenkins", "4K Ultra Monitor", 16, 450, 7200]
-        ];
-        activateSampleChip(sampleSalesBtn, "Enterprise Sales Sample (16 records)", "8 columns • Total Rev: $223,950");
-      }
-
-      function loadFinanceSample() {
-        dashboardTitle.value = "Corporate Budget & Spend Performance";
-        parsedHeaders = ["Cost_Center", "Department", "Quarter", "Budget", "Actual_Spend", "Variance", "Status"];
-        parsedRows = [
-          ["CC-101", "Engineering", "Q1", 450000, 428000, 22000, "Under Budget"],
-          ["CC-102", "Marketing", "Q1", 280000, 295000, -15000, "Over Budget"],
-          ["CC-103", "Sales Operations", "Q1", 320000, 310000, 10000, "Under Budget"],
-          ["CC-104", "Product Management", "Q1", 190000, 185000, 5000, "Under Budget"],
-          ["CC-105", "Customer Success", "Q1", 150000, 142000, 8000, "Under Budget"],
-          ["CC-101", "Engineering", "Q2", 480000, 472000, 8000, "Under Budget"],
-          ["CC-102", "Marketing", "Q2", 310000, 330000, -20000, "Over Budget"],
-          ["CC-103", "Sales Operations", "Q2", 340000, 325000, 15000, "Under Budget"],
-          ["CC-104", "Product Management", "Q2", 210000, 205000, 5000, "Under Budget"],
-          ["CC-105", "Customer Success", "Q2", 165000, 160000, 5000, "Under Budget"]
-        ];
-        activateSampleChip(sampleFinanceBtn, "Corporate Budget & Spend Sample (10 records)", "7 columns • Total Spend: $2,852,000");
-      }
-
-      function loadOpsSample() {
-        dashboardTitle.value = "Operations & Logistics Performance";
-        parsedHeaders = ["Shipment_ID", "Origin", "Destination", "Carrier", "Weight_Kg", "Cost", "Delivery_Days"];
-        parsedRows = [
-          ["SHP-801", "Chicago", "Dallas", "FedEx", 450, 1850, 2],
-          ["SHP-802", "Atlanta", "New York", "UPS", 780, 2400, 3],
-          ["SHP-803", "Los Angeles", "Seattle", "DHL", 320, 1400, 1],
-          ["SHP-804", "Dallas", "Miami", "FedEx", 610, 2100, 2],
-          ["SHP-805", "New York", "Boston", "UPS", 240, 950, 1],
-          ["SHP-806", "Seattle", "Denver", "FedEx", 550, 1900, 2],
-          ["SHP-807", "Miami", "Atlanta", "DHL", 410, 1600, 2],
-          ["SHP-808", "Denver", "Chicago", "UPS", 890, 2800, 3]
-        ];
-        activateSampleChip(sampleOpsBtn, "Logistics & Fulfillment Sample (8 records)", "7 columns • Total Cost: $15,000");
-      }
-
-      function activateSampleChip(btn, name, meta) {
-        currentFile = null;
-        [sampleSalesBtn, sampleFinanceBtn, sampleOpsBtn].forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        fileName.textContent = name;
-        fileMeta.textContent = meta;
-        fileBanner.style.display = 'flex';
-        dropzone.style.display = 'none';
-        downloadCard.style.display = 'none';
-      }
-
-      // Wire up Question inspiration chips
+      // Question Chips
       document.querySelectorAll('.q-chip').forEach(chip => {
         chip.addEventListener('click', () => {
           clientQuestion.value = chip.getAttribute('data-q');
@@ -1001,7 +1191,6 @@
         });
       });
 
-      // Question document upload handler
       if (qFileInput) {
         qFileInput.addEventListener('change', (e) => {
           if (e.target.files && e.target.files.length > 0) {
@@ -1020,9 +1209,90 @@
         });
       }
 
+      // Samples
+      sampleSalesBtn.addEventListener('click', () => {
+        dashboardTitle.value = "Executive Regional Sales Dashboard";
+        clientQuestion.value = "Compare revenue and units across Regions, highlight top products, and add slicers for Region.";
+        parsedHeaders = ["Order_ID", "Date", "Region", "Sales_Rep", "Product", "Units_Sold", "Unit_Price", "Revenue"];
+        parsedRows = [
+          [1001, "2026-01-05", "North", "David Miller", "Laptop Pro X", 24, 1200, 28800],
+          [1002, "2026-01-08", "South", "Emma Watson", "4K Ultra Monitor", 18, 450, 8100],
+          [1003, "2026-01-12", "East", "Michael Chang", "Cloud Storage Hub", 35, 300, 10500],
+          [1004, "2026-01-15", "West", "Sarah Jenkins", "Ergonomic Keypad", 50, 120, 6000],
+          [1005, "2026-01-20", "North", "David Miller", "4K Ultra Monitor", 22, 450, 9900],
+          [1006, "2026-01-25", "South", "Emma Watson", "Laptop Pro X", 30, 1200, 36000],
+          [1007, "2026-02-02", "East", "Michael Chang", "Laptop Pro X", 15, 1200, 18000],
+          [1008, "2026-02-07", "West", "Sarah Jenkins", "Cloud Storage Hub", 42, 300, 12600]
+        ];
+        activateSample(sampleSalesBtn, "Regional Sales Sample (8 records)", "8 columns • Total Rev: $129,900");
+      });
+
+      sampleFinanceBtn.addEventListener('click', () => {
+        dashboardTitle.value = "Corporate Financial Spend & Budget Variance";
+        clientQuestion.value = "Analyze Budget vs Actual Spend across Departments, show Variance, and filter by Department.";
+        parsedHeaders = ["Dept_Code", "Department", "Quarter", "Budget", "Actual_Spend", "Variance", "Approval_Status"];
+        parsedRows = [
+          ["ENG", "Engineering", "Q1", 450000, 420000, 30000, "Approved"],
+          ["MKT", "Marketing", "Q1", 280000, 310000, -30000, "Flagged"],
+          ["OPS", "Operations", "Q1", 350000, 340000, 10000, "Approved"],
+          ["SAL", "Sales", "Q1", 520000, 490000, 30000, "Approved"],
+          ["HR", "Human Resources", "Q1", 120000, 115000, 5000, "Approved"],
+          ["ENG", "Engineering", "Q2", 480000, 475000, 5000, "Approved"],
+          ["MKT", "Marketing", "Q2", 300000, 290000, 10000, "Approved"],
+          ["SAL", "Sales", "Q2", 550000, 560000, -10000, "Review"]
+        ];
+        activateSample(sampleFinanceBtn, "Financial Budget Sample (8 records)", "7 columns • Total Spend: $3.0M");
+      });
+
+      sampleOpsBtn.addEventListener('click', () => {
+        dashboardTitle.value = "Logistics & Fulfillment Performance";
+        clientQuestion.value = "Analyze freight cost and shipping weight across Carriers and Origins with carrier slicers.";
+        parsedHeaders = ["Shipment_ID", "Origin", "Destination", "Carrier", "Weight_Kg", "Cost", "Delivery_Days"];
+        parsedRows = [
+          ["SHP-801", "Chicago", "Dallas", "FedEx", 450, 1850, 2],
+          ["SHP-802", "Atlanta", "New York", "UPS", 780, 2400, 3],
+          ["SHP-803", "Los Angeles", "Seattle", "DHL", 320, 1400, 1],
+          ["SHP-804", "Dallas", "Miami", "FedEx", 610, 2100, 2],
+          ["SHP-805", "New York", "Boston", "UPS", 240, 950, 1],
+          ["SHP-806", "Seattle", "Denver", "FedEx", 550, 1900, 2]
+        ];
+        activateSample(sampleOpsBtn, "Logistics Sample (6 records)", "7 columns • Total Cost: $10,600");
+      });
+
+      function activateSample(btn, name, meta) {
+        currentFile = null;
+        [sampleSalesBtn, sampleFinanceBtn, sampleOpsBtn].forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        fileName.textContent = name;
+        fileMeta.textContent = meta;
+        fileBanner.style.display = 'flex';
+        dropzone.style.display = 'none';
+        downloadCard.style.display = 'none';
+      }
+
+      function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+      function setStep(num, text, pct) {
+        progressTitle.textContent = text;
+        progressPct.textContent = pct + "%";
+        [step1, step2, step3, step4].forEach((s, idx) => {
+          s.classList.remove('active', 'done');
+          if (idx + 1 < num) s.classList.add('done');
+          if (idx + 1 === num) s.classList.add('active');
+        });
+      }
+
+      function showSuccess() {
+        progressPanel.style.display = 'none';
+        downloadCard.style.display = 'flex';
+        buildBtn.disabled = false;
+        downloadCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      // Build execution
       buildBtn.addEventListener('click', async () => {
         if (parsedHeaders.length === 0 || parsedRows.length === 0) {
-          alert("Please upload a client data file (.csv, .xlsx) or click one of the sample datasets first.");
+          alert("Please upload a client data file or select one of the verified sample datasets first.");
           return;
         }
 
@@ -1031,10 +1301,9 @@
         downloadCard.style.display = 'none';
 
         setStep(1, "Ingesting client dataset schema & data types...", 25);
-        await sleep(400);
+        await sleep(350);
 
         let uploadFile = currentFile;
-        // If a sample dataset is used without an explicit file upload, build a virtual CSV file
         if (!uploadFile && parsedRows.length > 0) {
           const csvLines = [parsedHeaders.join(",")];
           parsedRows.forEach(r => csvLines.push(r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")));
@@ -1053,7 +1322,7 @@
             if (currentQuestionFile) formData.append('question_file', currentQuestionFile);
 
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s for deep AI analysis
+            const timeoutId = setTimeout(() => controller.abort(), 45000);
 
             const urls = ['/api/dashboard/generate-from-data', 'http://localhost:8000/api/dashboard/generate-from-data'];
             for (let url of urls) {
@@ -1066,9 +1335,9 @@
                 if (res.ok) {
                   const data = await res.json();
                   clearTimeout(timeoutId);
-                  setStep(3, `AI architected ${data.kpis_created || 4} KPIs, ${data.analyses_created || 2} breakdown tables & native charts...`, 75);
+                  setStep(3, `AI architected ${data.kpis_created || 4} KPIs & breakdown tables...`, 75);
                   await sleep(400);
-                  setStep(4, `Compiled ${data.formula_count || 16} dynamic formulas (=SUMIFS, =AVERAGEIFS) with cached evaluation...`, 100);
+                  setStep(4, `Compiled ${data.formula_count || 16} dynamic formulas with OpenXML cache...`, 100);
                   await sleep(300);
 
                   outputFilename = data.filename || "Client_Executive_Dashboard.xlsx";
@@ -1076,7 +1345,7 @@
                   window._backendDownloadUrl = data.download_url;
 
                   resSheet.textContent = "01_Executive_Dashboard";
-                  resFormulas.textContent = `${data.formula_count || 16} Dynamic`;
+                  resFormulas.textContent = `${data.formula_count || 16} Real Dynamic`;
                   resMetric.textContent = data.ai_used ? "Gemini 3.6 Flash" : "NLP Architect";
                   resRecords.textContent = `${data.row_count || parsedRows.length} Records`;
                   downloadDesc.textContent = data.ai_summary || `Tailored executive dashboard compiled directly from ${uploadFile.name} answering your business questions.`;
@@ -1090,11 +1359,12 @@
           } catch (err) {}
         }
 
+        // Offline Client Fallback
         setStep(2, "Analyzing client measures & business question keywords...", 50);
-        await sleep(400);
+        await sleep(350);
 
         setStep(3, "Structuring Executive Dashboard with real SUM & SUMIFS formulas...", 75);
-        await sleep(500);
+        await sleep(400);
 
         setStep(4, "Finalizing OpenXML workbook from client data...", 100);
         await sleep(300);
@@ -1120,14 +1390,13 @@
             if (v !== "" && v !== null && v !== undefined) vals.push(String(v));
           });
           const isNum = numCount >= numRows * 0.6;
-          const uniques = Array.from(new Set(vals));
           return {
             index: colIdx,
             name: header,
             isNum,
             sum,
-            uniques: uniques.slice(0, 20),
-            uniqueCount: uniques.length,
+            uniques: Array.from(new Set(vals)).slice(0, 20),
+            uniqueCount: new Set(vals).size
           };
         });
 
@@ -1136,13 +1405,9 @@
           const l = m.name.toLowerCase();
           let score = 0;
           if (qText.includes(l)) score += 100;
-          for (const word of l.split(/[\s_]+/)) {
-            if (word.length > 2 && qText.includes(word)) score += 30;
-          }
-          if (l.includes("revenue") || l.includes("sales") || l.includes("amount") || l.includes("spend") || l.includes("budget")) score += 10;
-          if (l.includes("profit") || l.includes("variance") || l.includes("margin")) score += 9;
-          if (l.includes("cost") || l.includes("expense") || l.includes("price")) score += 8;
-          if (l.includes("unit") || l.includes("qty") || l.includes("quantity") || l.includes("weight")) score += 7;
+          if (l.includes("revenue") || l.includes("sales") || l.includes("amount")) score += 10;
+          if (l.includes("profit") || l.includes("variance")) score += 9;
+          if (l.includes("cost") || l.includes("price")) score += 8;
           return score;
         }
         measures.sort((a, b) => measureScore(b) - measureScore(a));
@@ -1155,21 +1420,14 @@
           const l = d.name.toLowerCase();
           let score = 0;
           if (qText.includes(l)) score += 100;
-          for (const word of l.split(/[\s_]+/)) {
-            if (word.length > 2 && qText.includes(word)) score += 30;
-          }
-          if (l.includes("region") || l.includes("territory") || l.includes("country")) score += 10;
-          if (l.includes("department") || l.includes("division") || l.includes("category")) score += 9;
-          if (l.includes("product") || l.includes("item") || l.includes("carrier")) score += 8;
-          if (l.includes("rep") || l.includes("salesperson") || l.includes("name")) score += 7;
-          if (l.includes("quarter") || l.includes("month") || l.includes("status")) score += 6;
-          if (d.uniqueCount >= 2 && d.uniqueCount <= 15) score += 5;
+          if (l.includes("region") || l.includes("territory")) score += 10;
+          if (l.includes("department") || l.includes("category")) score += 9;
+          if (l.includes("product") || l.includes("item")) score += 8;
           return score;
         }
         dimensions.sort((a, b) => dimScore(b) - dimScore(a));
 
         const primaryDim = dimensions[0] || { index: 0, name: parsedHeaders[0], uniques: ["Total"] };
-        const secondaryDim = (dimensions[1] && dimensions[1].name !== primaryDim.name) ? dimensions[1] : null;
 
         const wbOut = XLSX.utils.book_new();
 
@@ -1189,7 +1447,7 @@
         const pColLetter = getColLetter(primaryMeasure.index);
         const lastDataRow = numRows + 1;
         const avgVal = numRows > 0 ? (primaryMeasure.sum / numRows) : 0;
-        const isCurrency = anyKeyword(primaryMeasure.name, ["revenue", "sales", "cost", "price", "amount", "budget", "spend", "profit"]);
+        const isCurrency = ["revenue", "sales", "cost", "price", "amount", "budget", "spend", "profit"].some(kw => primaryMeasure.name.toLowerCase().includes(kw));
         const currFmt = isCurrency ? "$#,##0" : "#,##0";
 
         const kpiValues = [
@@ -1208,155 +1466,73 @@
         const tblStartRow = dashAOA.length + 1;
         const dimColLetter = getColLetter(primaryDim.index);
 
-        primaryDim.uniques.forEach((catVal) => {
+        primaryDim.uniques.forEach(cat => {
+          const sumFormula = `SUMIFS(Raw_Data!${pColLetter}2:${pColLetter}${lastDataRow}, Raw_Data!${dimColLetter}2:${dimColLetter}${lastDataRow}, "${cat}")`;
           let catSum = 0;
           parsedRows.forEach(r => {
-            if (String(r[primaryDim.index]) === String(catVal)) {
-              catSum += Number(r[primaryMeasure.index]) || 0;
+            if (String(r[primaryDim.index]) === String(cat)) {
+              const val = Number(r[primaryMeasure.index]);
+              if (!isNaN(val)) catSum += val;
             }
           });
-          const share = primaryMeasure.sum > 0 ? (catSum / primaryMeasure.sum) : 0;
-          const currRowIdx = dashAOA.length + 1;
           dashAOA.push([
-            catVal,
-            { f: `SUMIFS(Raw_Data!${pColLetter}2:${pColLetter}${lastDataRow}, Raw_Data!${dimColLetter}2:${dimColLetter}${lastDataRow}, "${catVal}")`, v: catSum, z: currFmt },
-            { f: `B${currRowIdx}/$B$${tblStartRow + primaryDim.uniques.length}`, v: share, z: "0.0%" }
+            cat,
+            { f: sumFormula, v: catSum, z: currFmt },
+            { f: `B${dashAOA.length + 1}/$B$${tblStartRow + primaryDim.uniques.length}`, v: (primaryMeasure.sum > 0 ? catSum / primaryMeasure.sum : 0), z: "0.0%" }
           ]);
         });
 
-        const endCatRow = dashAOA.length;
+        const totRowIdx = tblStartRow + primaryDim.uniques.length;
         dashAOA.push([
-          "Grand Total",
-          { f: `SUM(B${tblStartRow}:B${endCatRow})`, v: primaryMeasure.sum, z: currFmt },
-          { f: `SUM(C${tblStartRow}:C${endCatRow})`, v: 1.0, z: "0.0%" }
+          "GRAND TOTAL",
+          { f: `SUM(B${tblStartRow}:B${totRowIdx - 1})`, v: primaryMeasure.sum, z: currFmt },
+          { f: `SUM(C${tblStartRow}:C${totRowIdx - 1})`, v: 1.0, z: "0.0%" }
         ]);
-        dashAOA.push([]);
-
-        if (secondaryDim && secondaryDim.uniques.length > 1) {
-          dashAOA.push([]);
-          dashAOA.push([`SECONDARY BREAKDOWN BY ${secondaryDim.name.toUpperCase()}`, primaryMeasure.name.toUpperCase(), "SHARE %"]);
-          const sTblStart = dashAOA.length + 1;
-          const sDimColLetter = getColLetter(secondaryDim.index);
-
-          secondaryDim.uniques.forEach((sVal) => {
-            let sSum = 0;
-            parsedRows.forEach(r => {
-              if (String(r[secondaryDim.index]) === String(sVal)) {
-                sSum += Number(r[primaryMeasure.index]) || 0;
-              }
-            });
-            const sShare = primaryMeasure.sum > 0 ? (sSum / primaryMeasure.sum) : 0;
-            const sRowIdx = dashAOA.length + 1;
-            dashAOA.push([
-              sVal,
-              { f: `SUMIFS(Raw_Data!${pColLetter}2:${pColLetter}${lastDataRow}, Raw_Data!${sDimColLetter}2:${sDimColLetter}${lastDataRow}, "${sVal}")`, v: sSum, z: currFmt },
-              { f: `B${sRowIdx}/$B$${sTblStart + secondaryDim.uniques.length}`, v: sShare, z: "0.0%" }
-            ]);
-          });
-
-          const sEndRow = dashAOA.length;
-          dashAOA.push([
-            "Grand Total",
-            { f: `SUM(B${sTblStart}:B${sEndRow})`, v: primaryMeasure.sum, z: currFmt },
-            { f: `SUM(C${sTblStart}:C${sEndRow})`, v: 1.0, z: "0.0%" }
-          ]);
-        }
 
         const wsDash = XLSX.utils.aoa_to_sheet(dashAOA);
-        wsDash["!cols"] = [{wch: 32}, {wch: 24}, {wch: 18}, {wch: 18}];
-        XLSX.utils.book_append_sheet(wbOut, wsDash, "Executive_Dashboard");
+        wsDash['!cols'] = [{ wch: 32 }, { wch: 22 }, { wch: 18 }, { wch: 18 }];
+        XLSX.utils.book_append_sheet(wbOut, wsDash, "01_Executive_Dashboard");
 
-        const rawSheetData = [parsedHeaders, ...parsedRows];
-        const wsRaw = XLSX.utils.aoa_to_sheet(rawSheetData);
-        wsRaw["!cols"] = parsedHeaders.map(h => ({wch: Math.max(12, h.length + 4)}));
-        XLSX.utils.book_append_sheet(wbOut, wsRaw, "Raw_Data");
+        // 2. Raw_Data Worksheet
+        const rawDataAOA = [parsedHeaders];
+        parsedRows.forEach(r => rawDataAOA.push(r));
+        const wsRaw = XLSX.utils.aoa_to_sheet(rawDataAOA);
+        XLSX.utils.book_append_sheet(wbOut, wsRaw, "02_Client_Data");
 
-        const auditAOA = [
-          ["EXECUTIVE WORKBOOK AUDIT & VALIDATION"],
-          [],
-          ["Validation Check", "Status & Source Detail"],
-          ["Ingested Client Source", currentFile ? currentFile.name : (fileName.textContent || "Client Ingest")],
-          ["Client Records Ingested", `${numRows} rows formatted in Raw_Data`],
-          ["Schema Headers Ingested", `${parsedHeaders.length} columns: ${parsedHeaders.join(', ')}`],
-          ["Primary Metric Model", `${primaryMeasure.name} (SUM: ${isCurrency ? '$' : ''}${primaryMeasure.sum.toLocaleString()})`],
-          ["Primary Dimension", `${primaryDim.name} (${primaryDim.uniques.length} categories)`],
-          ["Formula Engine", "100% Real Dynamic Formulas (=SUM, =SUMIFS, =AVERAGE, =COUNTA)"],
-          ["Zero Hallucination Status", "PASSED — 100% Client Data Integrity Verified"],
-        ];
-        const wsAudit = XLSX.utils.aoa_to_sheet(auditAOA);
-        wsAudit["!cols"] = [{wch: 26}, {wch: 55}];
-        XLSX.utils.book_append_sheet(wbOut, wsAudit, "Audit_Trail");
+        const wbArray = XLSX.write(wbOut, { bookType: 'xlsx', type: 'array' });
+        generatedWorkbookBlob = new Blob([wbArray], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        outputFilename = `${title.replace(/[^a-zA-Z0-9_-]/g, "_")}.xlsx`;
+        window._backendDownloadUrl = null;
 
-        const cleanTitle = (dashboardTitle.value.trim().replace(/\\s+/g, '_') || "Client_Executive_Dashboard");
-        outputFilename = cleanTitle + ".xlsx";
-
-        const wbout = XLSX.write(wbOut, {bookType: 'xlsx', type: 'array'});
-        generatedWorkbookBlob = new Blob([wbout], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-
-        resSheet.textContent = "Executive_Dashboard";
-        resFormulas.textContent = "100% Dynamic";
-        resMetric.textContent = primaryMeasure.name;
-        resRecords.textContent = `${numRows} Rows`;
-        downloadDesc.textContent = `100% authentic dashboard compiled from your data (Zero hallucination).`;
+        resSheet.textContent = "01_Executive_Dashboard";
+        resFormulas.textContent = `${primaryDim.uniques.length + 5} Dynamic`;
+        resMetric.textContent = "NLP Fallback Engine";
+        resRecords.textContent = `${numRows} Records`;
+        downloadDesc.textContent = `Executive workbook compiled with dynamic structured formulas for ${title}.`;
 
         showSuccess();
       }
 
-      function anyKeyword(str, kwList) {
-        const l = str.toLowerCase();
-        return kwList.some(k => l.includes(k));
-      }
-
-      function setStep(num, title, pct) {
-        progressTitle.textContent = title;
-        progressPct.textContent = pct + "%";
-
-        const steps = [step1, step2, step3, step4];
-        steps.forEach((s, idx) => {
-          if (idx + 1 < num) {
-            s.className = "step-item done";
-            s.querySelector('.step-icon').textContent = "✓";
-          } else if (idx + 1 === num) {
-            s.className = "step-item active";
-            s.querySelector('.step-icon').textContent = num;
-          } else {
-            s.className = "step-item";
-            s.querySelector('.step-icon').textContent = idx + 1;
-          }
-        });
-      }
-
-      function showSuccess() {
-        buildBtn.disabled = false;
-        progressPanel.style.display = 'none';
-        downloadCard.style.display = 'block';
-        downloadCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-
       downloadFinalBtn.addEventListener('click', () => {
         if (window._backendDownloadUrl) {
-          window.location.href = window._backendDownloadUrl;
-          window._backendDownloadUrl = null;
-          return;
-        }
-
-        if (generatedWorkbookBlob) {
+          const a = document.createElement('a');
+          a.href = window._backendDownloadUrl;
+          a.download = outputFilename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        } else if (generatedWorkbookBlob) {
           const url = URL.createObjectURL(generatedWorkbookBlob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = outputFilename;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          setTimeout(() => URL.revokeObjectURL(url), 2000);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = outputFilename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
         }
       });
 
-      function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-      }
-
-      loadSalesSample();
     })();
   </script>
 </body>

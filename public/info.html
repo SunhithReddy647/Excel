@@ -3,472 +3,584 @@
 <head>
   
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <title>Architecture &amp; Technical Guide — ExcelFlow</title>
+  <title>Technical Architecture &amp; Formulas — ExcelFlow</title>
   <meta name="description" content="Technical guide on ExcelFlow formula engineering, native Microsoft Excel Slicers, OpenXML cache pre-evaluation, and zero-hallucination data architecture.">
   <style>
     
     :root {
-      --bg: #F8FAFC;
+      --bg: #FBF8F3;
+      --bg-alt: #F3EFE6;
+      --ink: #0A0A0A;
       --card-bg: #FFFFFF;
-      --text-main: #0F172A;
-      --text-muted: #64748B;
-      --border-subtle: #E2E8F0;
-      --border-strong: #CBD5E1;
-      --excel-green: #107C41;
-      --excel-dark: #0D6535;
+      --excel: #107C41;
+      --excel-hover: #0D6535;
       --excel-light: #EBF7EE;
-      --navy: #1E3A8A;
-      --navy-light: #EFF6FF;
-      --forest: #166534;
-      --amber: #B45309;
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 14px;
-      --radius-xl: 20px;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      --yellow: #FFE600;
+      --yellow-light: #FFFBE6;
+      --blue: #2563EB;
+      --blue-light: #EFF6FF;
+      --coral: #FF5A5F;
+      --coral-light: #FFF1F2;
+      --purple: #8B5CF6;
+      --purple-light: #F5F3FF;
+      --muted: #525252;
+      --border-w: 2.5px;
+      --radius: 8px;
+      --radius-sm: 5px;
+      --radius-pill: 9999px;
+      --shadow-sm: 2px 2px 0px var(--ink);
+      --shadow-md: 4px 4px 0px var(--ink);
+      --shadow-lg: 6px 6px 0px var(--ink);
+      --shadow-xl: 8px 8px 0px var(--ink);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     body {
       background-color: var(--bg);
-      color: var(--text-main);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--ink);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
+      background-image: radial-gradient(var(--ink) 0.65px, transparent 0.65px);
+      background-size: 20px 20px;
     }
 
     .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
 
-    /* Header */
-    header {
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-subtle);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+    /* Neo-Brutalist Layout Shell */
+    .container {
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 16px;
     }
 
-    .nav-container {
-      max-width: 1160px;
-      margin: 0 auto;
-      padding: 0 24px;
-      height: 68px;
+    /* Neo-Brutalist Header */
+    header {
+      background: #FFFFFF;
+      border-bottom: var(--border-w) solid var(--ink);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      height: 72px;
     }
 
-    .nav-left {
+    .brand-logo {
       display: flex;
       align-items: center;
-      gap: 32px;
-    }
-
-    .logo-badge {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      gap: 10px;
       text-decoration: none;
-      color: var(--text-main);
+      color: var(--ink);
+      font-weight: 900;
+      font-size: 1.25rem;
+      letter-spacing: -0.03em;
     }
 
-    .excel-icon {
-      width: 34px;
-      height: 34px;
-      background: var(--excel-green);
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--excel);
       color: white;
+      border: var(--border-w) solid var(--ink);
+      box-shadow: 2.5px 2.5px 0px var(--ink);
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 16px;
-      box-shadow: 0 2px 4px rgba(16, 124, 65, 0.25);
+      font-weight: 900;
+      font-size: 1.1rem;
     }
 
-    .brand-name {
-      font-size: 1.15rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .nav-links {
+    .nav-menu {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 8px;
       list-style: none;
     }
 
-    .nav-link {
-      color: var(--text-muted);
+    .nav-item a {
+      display: inline-block;
       text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: var(--radius-sm);
-      transition: all 0.15s ease;
-    }
-
-    .nav-link:hover {
-      color: var(--text-main);
-      background: #F1F5F9;
-    }
-
-    .nav-link.active {
-      color: var(--excel-green);
-      background: var(--excel-light);
+      color: var(--ink);
       font-weight: 700;
+      font-size: 0.88rem;
+      padding: 8px 14px;
+      border: var(--border-w) solid transparent;
+      border-radius: var(--radius-sm);
+      transition: all 0.12s ease;
     }
 
-    .nav-right {
+    .nav-item a:hover {
+      background: var(--yellow);
+      border-color: var(--ink);
+      box-shadow: 2px 2px 0px var(--ink);
+      transform: translate(-1px, -1px);
+    }
+
+    .nav-item a.active {
+      background: var(--ink);
+      color: #FFFFFF;
+      border-color: var(--ink);
+      box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+    }
+
+    .nav-actions {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .btn-nav-maker {
-      background: var(--excel-green);
-      color: white;
+    .btn-brutal {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 0.9rem;
       text-decoration: none;
-      font-size: 0.88rem;
-      font-weight: 700;
       padding: 9px 18px;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      white-space: nowrap;
+    }
+
+    .btn-brutal:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-brutal:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--ink);
+    }
+
+    .btn-primary {
+      background: var(--excel);
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover {
+      background: var(--excel-hover);
+    }
+
+    .btn-secondary {
+      background: #FFFFFF;
+      color: var(--ink);
+    }
+
+    .btn-yellow {
+      background: var(--yellow);
+      color: var(--ink);
+    }
+
+    .btn-coral {
+      background: var(--coral);
+      color: #FFFFFF;
+    }
+
+    /* Mobile Hamburger */
+    .mobile-menu-toggle {
+      display: none;
+      background: #FFFFFF;
+      border: var(--border-w) solid var(--ink);
+      box-shadow: 2px 2px 0px var(--ink);
       border-radius: var(--radius-sm);
-      transition: all 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 2px 6px rgba(16, 124, 65, 0.2);
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 1.1rem;
     }
 
-    .btn-nav-maker:hover {
-      background: var(--excel-dark);
+    .mobile-drawer {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px;
+      background: #FFFFFF;
+      border-bottom: var(--border-w) solid var(--ink);
     }
 
-    .btn-nav-ref {
-      color: var(--text-main);
+    .mobile-drawer.open {
+      display: flex;
+    }
+
+    .mobile-drawer a {
       text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-strong);
-      background: white;
-      transition: all 0.15s ease;
+      color: var(--ink);
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 12px 16px;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--bg);
+      box-shadow: 3px 3px 0px var(--ink);
+    }
+
+    .mobile-drawer a.active {
+      background: var(--yellow);
+    }
+
+    /* Stickers & Eyebrows */
+    .sticker {
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      font-size: 0.76rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 4px 10px;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius-pill);
+      box-shadow: 2px 2px 0px var(--ink);
+      background: var(--yellow);
     }
 
-    .btn-nav-ref:hover {
-      background: #F8FAFC;
-      border-color: #94A3B8;
+    .sticker-excel { background: var(--excel-light); color: var(--excel); }
+    .sticker-ai { background: var(--purple-light); color: var(--purple); }
+    .sticker-blue { background: var(--blue-light); color: var(--blue); }
+
+    /* Neo-Brutal Cards */
+    .brutal-card {
+      background: var(--card-bg);
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      padding: 24px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .brutal-card:hover {
+      box-shadow: var(--shadow-lg);
     }
 
     /* Footer */
     footer {
       margin-top: auto;
-      border-top: 1px solid var(--border-subtle);
-      padding: 40px 24px;
-      background: white;
-      font-size: 0.85rem;
-      color: var(--text-muted);
+      background: #FFFFFF;
+      border-top: var(--border-w) solid var(--ink);
+      padding: 44px 16px 36px;
     }
 
-    .footer-container {
-      max-width: 1160px;
-      margin: 0 auto;
+    .footer-content {
       display: flex;
       flex-direction: column;
-      gap: 16px;
       align-items: center;
       text-align: center;
+      gap: 20px;
     }
 
-    .footer-nav {
+    .footer-links {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
+      gap: 12px 24px;
       list-style: none;
     }
 
-    .footer-nav a {
-      color: var(--text-muted);
+    .footer-links a {
       text-decoration: none;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.88rem;
+      border-bottom: 2px solid transparent;
+    }
+
+    .footer-links a:hover {
+      border-bottom-color: var(--ink);
+    }
+
+    .footer-bottom {
+      font-size: 0.82rem;
+      color: var(--muted);
       font-weight: 600;
     }
 
-    .footer-nav a:hover {
-      color: var(--excel-green);
+    /* Responsive Queries */
+    @media (max-width: 840px) {
+      .nav-menu { display: none; }
+      .mobile-menu-toggle { display: block; }
+      .nav-actions .btn-secondary { display: none; }
     }
 
-    @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .btn-nav-ref { display: none; }
+    @media (max-width: 480px) {
+      .btn-brutal { padding: 8px 14px; font-size: 0.84rem; }
+      .nav-actions { gap: 6px; }
     }
 
 
-    .doc-container {
+    .doc-wrap {
       max-width: 960px;
       margin: 40px auto 80px;
-      padding: 0 24px;
     }
 
     .doc-header {
-      margin-bottom: 40px;
-      border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 24px;
+      text-align: center;
+      margin-bottom: 44px;
     }
 
     .doc-title {
-      font-size: 2.5rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900;
+      letter-spacing: -0.035em;
       margin-bottom: 12px;
     }
 
-    .doc-subtitle {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      line-height: 1.6;
+    .doc-desc {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 700px;
+      margin: 0 auto;
+      font-weight: 500;
     }
 
     .doc-section {
-      background: white;
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 32px;
-      margin-bottom: 28px;
-      box-shadow: var(--shadow-sm);
+      background: #FFFFFF;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      padding: clamp(22px, 4vw, 36px);
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
-    .doc-section h2 {
+    .doc-sec-title {
       font-size: 1.4rem;
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: -0.02em;
-      color: var(--text-main);
-      margin-bottom: 16px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
-    .doc-section p {
-      color: var(--text-muted);
-      line-height: 1.7;
-      margin-bottom: 16px;
+    .doc-text {
       font-size: 0.95rem;
+      line-height: 1.65;
+      color: #333333;
     }
 
-    .code-box {
-      background: #0F172A;
-      color: #E2E8F0;
-      border-radius: var(--radius-md);
+    .code-block {
+      background: #1E293B;
+      color: #F8FAFC;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius-sm);
       padding: 16px 20px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.88rem;
-      line-height: 1.6;
-      margin: 16px 0;
       overflow-x: auto;
-      border: 1px solid #1E293B;
+      box-shadow: 3px 3px 0px var(--ink);
+      line-height: 1.5;
     }
 
-    .code-box .highlight { color: #38BDF8; font-weight: 600; }
-    .code-box .formula { color: #34D399; }
-    .code-box .comment { color: #64748B; font-style: italic; }
+    .code-block .hl-func { color: #38BDF8; font-weight: 700; }
+    .code-block .hl-tbl { color: #4ADE80; }
+    .code-block .hl-col { color: #FCD34D; }
+    .code-block .hl-str { color: #F472B6; }
 
-    .cheat-grid {
+    .flow-steps {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 16px;
-      margin-top: 20px;
+      margin-top: 10px;
     }
 
-    .cheat-card {
-      background: #F8FAFC;
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 20px;
-      position: relative;
-    }
-
-    .cheat-card h4 {
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: var(--navy);
-    }
-
-    .cheat-desc {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-
-    .cheat-formula {
-      background: white;
-      border: 1px solid #CBD5E1;
-      padding: 8px 12px;
+    .flow-card {
+      background: var(--bg);
+      border: 2px solid var(--ink);
       border-radius: var(--radius-sm);
-      font-family: 'JetBrains Mono', monospace;
+      padding: 16px;
+      box-shadow: 2px 2px 0px var(--ink);
+    }
+
+    .flow-card-num {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--excel);
+      margin-bottom: 4px;
+    }
+
+    .flow-card-title {
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+    }
+
+    .flow-card-desc {
       font-size: 0.82rem;
-      color: var(--excel-dark);
-      font-weight: 600;
-      word-break: break-all;
+      color: var(--muted);
+      line-height: 1.5;
     }
   </style>
 </head>
 <body>
   
   <header>
-    <div class="nav-container">
-      <div class="nav-left">
-        <a href="index.html" class="logo-badge">
-          <div class="excel-icon">X</div>
-          <span class="brand-name font-display">ExcelFlow</span>
+    <div class="container">
+      <nav class="nav-bar">
+        <a href="index.html" class="brand-logo font-display">
+          <div class="brand-icon">X</div>
+          <span>ExcelFlow</span>
         </a>
 
-        <ul class="nav-links">
-          <li><a href="index.html" class="nav-link ">Home</a></li>
-          <li><a href="maker.html" class="nav-link ">Excel Maker Studio</a></li>
-          <li><a href="info.html" class="nav-link active">Architecture &amp; Docs</a></li>
-          <li><a href="tools.html" class="nav-link ">Data Utilities</a></li>
+        <ul class="nav-menu">
+          <li class="nav-item"><a href="index.html" class="">Home</a></li>
+          <li class="nav-item"><a href="maker.html" class="">Excel Maker Studio</a></li>
+          <li class="nav-item"><a href="info.html" class="active">Tech Architecture</a></li>
+          <li class="nav-item"><a href="tools.html" class="">Data Utilities</a></li>
         </ul>
-      </div>
 
-      <div class="nav-right">
-        <a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download class="btn-nav-ref">
-          <span>⬇️ Sample .xlsx</span>
-        </a>
-        <a href="maker.html" class="btn-nav-maker font-display">
-          <span>⚡ Launch Maker</span>
-        </a>
-      </div>
+        <div class="nav-actions">
+          <a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download class="btn-brutal btn-secondary font-display" title="Download Reference Workbook">
+            <span>⬇ Reference .xlsx</span>
+          </a>
+          <a href="maker.html" class="btn-brutal btn-primary font-display">
+            <span>⚡ Launch Studio</span>
+          </a>
+          <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Toggle navigation">☰</button>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-drawer" id="mobileDrawer">
+      <a href="index.html" class="">🏠 Home Landing</a>
+      <a href="maker.html" class="">⚡ Excel Maker Studio</a>
+      <a href="info.html" class="active">📐 Tech Architecture &amp; Formulas</a>
+      <a href="tools.html" class="">🛠️ Data &amp; Spreadsheet Utilities</a>
+      <a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download>⬇ Download Sample .xlsx Workbook</a>
     </div>
   </header>
 
 
-  <main class="doc-container">
+  <main class="container doc-wrap">
     <div class="doc-header">
-      <h1 class="doc-title font-display">Technical Architecture &amp; Guide</h1>
-      <p class="doc-subtitle">A rigorous breakdown of the ExcelFlow spreadsheet compiler, formula engine, native Slicers integration, and data integrity verification.</p>
+      <div class="sticker sticker-excel" style="margin-bottom: 12px;">Engineering Whitepaper</div>
+      <h1 class="doc-title font-display">Technical Architecture &amp; Formula Guide</h1>
+      <p class="doc-desc">How ExcelFlow compiles verified, institutional-grade Microsoft Excel workbooks with zero hallucinations and real dynamic formulas.</p>
     </div>
 
-    <!-- Section 1 -->
+    <!-- Section 1: Formula Engineering -->
     <div class="doc-section">
-      <h2 class="font-display"><span>1.</span> Structured References vs. Hardcoded Cells</h2>
-      <p>
-        In institutional modeling, static coordinate references like <code>A2:A50</code> break whenever users sort or insert rows. ExcelFlow structures raw data into formal Microsoft Excel Tables (<code>ListObject</code> named <code>DataTable</code>).
+      <h2 class="doc-sec-title font-display">
+        <span class="sticker sticker-excel">01</span>
+        <span>Dynamic Formula Engineering</span>
+      </h2>
+      <p class="doc-text">
+        Unlike standard AI code generators that output static cell numbers or raw values, ExcelFlow strictly binds every summary table, total, and KPI to <strong>structured table formulas</strong>. When your client filters or alters the underlying records, the dashboard updates automatically.
       </p>
-      <p>
-        This allows summary tables and KPIs to use structured references that automatically expand as data grows:
-      </p>
-      <div class="code-box">
-<span class="comment">// 1. Structured KPI Reference</span>
-<span class="formula">=SUM(DataTable[Revenue])</span>
 
-<span class="comment">// 2. Dynamic Multidimensional Aggregation</span>
-<span class="formula">=SUMIFS(DataTable[Revenue], DataTable[Region], A8, DataTable[Month], "Jan")</span>
+      <div class="code-block">
+<span class="hl-func">=SUMIFS</span>(<span class="hl-tbl">DataTable</span>[<span class="hl-col">Revenue</span>], <span class="hl-tbl">DataTable</span>[<span class="hl-col">Region</span>], <span class="hl-str">"North"</span>)
+<span class="hl-func">=AVERAGEIFS</span>(<span class="hl-tbl">DataTable</span>[<span class="hl-col">Length_Of_Stay</span>], <span class="hl-tbl">DataTable</span>[<span class="hl-col">Department</span>], <span class="hl-str">"Cardiology"</span>)
+<span class="hl-func">=COUNTIFS</span>(<span class="hl-tbl">DataTable</span>[<span class="hl-col">Approval_Status</span>], <span class="hl-str">"Approved"</span>)
       </div>
-    </div>
 
-    <!-- Section 2 -->
-    <div class="doc-section">
-      <h2 class="font-display"><span>2.</span> Native Interactive Excel Slicers</h2>
-      <p>
-        Most web tools generate static shapes pretending to be slicers. ExcelFlow binds genuine interactive slicers using Microsoft Excel's COM automation API (<code>SlicerCaches.Add2</code>).
-      </p>
-      <p>
-        When opened in Excel, clicking a slicer button dynamically updates PivotTables and connected summary charts in real time.
-      </p>
-      <div class="code-box">
-<span class="comment"># win32com Slicer Engine Binding</span>
-slicer_cache = wb.SlicerCaches.Add2(pivot_table, <span class="highlight">"Region"</span>)
-slicer = slicer_cache.Slicers.Add(
-    SlicerDestination=ws_dashboard,
-    Name=<span class="highlight">"Slicer_Region"</span>,
-    Caption=<span class="highlight">"Filter: Region"</span>,
-    Top=460, Left=370, Width=150, Height=170
-)
-slicer.Style = <span class="highlight">"SlicerStyleLight2"</span>
-      </div>
-    </div>
-
-    <!-- Section 3 -->
-    <div class="doc-section">
-      <h2 class="font-display"><span>3.</span> OpenXML Pre-Evaluation Cache</h2>
-      <p>
-        When formulas are written by code, spreadsheet viewers that lack calculation engines (such as mobile viewers or macOS QuickLook) will display zeros or empty cells unless the OpenXML <code>&lt;v&gt;</code> element is populated.
-      </p>
-      <p>
-        ExcelFlow triggers a full calculation pass via <code>excel.CalculateFull()</code> before saving, embedding exact precomputed numerical results directly into the OpenXML payload for instant display anywhere.
+      <p class="doc-text">
+        <strong>Grand Totals:</strong> Calculated using dynamic <span class="code-pill">=SUM(B10:B14)</span> or <span class="code-pill">=AVERAGE(...)</span> formulas. There are zero unlinked constants on the dashboard.
       </p>
     </div>
 
-    <!-- Section 4 -->
+    <!-- Section 2: Gemini 3.6 Flash Synthesis Pipeline -->
     <div class="doc-section">
-      <h2 class="font-display"><span>4.</span> Interactive Formula Reference Cheat Sheet</h2>
-      <p>Common institutional Excel formulas utilized by the ExcelFlow architecture:</p>
+      <h2 class="doc-sec-title font-display">
+        <span class="sticker sticker-ai">02</span>
+        <span>AI Question &amp; Data Synthesis Pipeline</span>
+      </h2>
+      <p class="doc-text">
+        When you submit a dataset and prompt, ExcelFlow executes a strict 4-stage pipeline that guarantees complete mathematical precision:
+      </p>
 
-      <div class="cheat-grid">
-        <div class="cheat-card">
-          <h4>Dynamic SUMIFS</h4>
-          <div class="cheat-desc">Aggregates revenue filtered by region or product category.</div>
-          <div class="cheat-formula">=SUMIFS(DataTable[Revenue], DataTable[Region], A8)</div>
+      <div class="flow-steps">
+        <div class="flow-card">
+          <div class="flow-card-num font-display">STAGE 1</div>
+          <div class="flow-card-title">Schema &amp; Type Profiling</div>
+          <div class="flow-card-desc">Columns classified into measures, dimensions, dates, unique counts, and null distributions.</div>
         </div>
-
-        <div class="cheat-card">
-          <h4>Conditional Quota Tier (Nested IF)</h4>
-          <div class="cheat-desc">Graduated performance status based on rep achievement.</div>
-          <div class="cheat-formula">=IF(I21>=900, "Top Performer", IF(I21>=800, "Exceeded", "Met"))</div>
+        <div class="flow-card">
+          <div class="flow-card-num font-display">STAGE 2</div>
+          <div class="flow-card-title">Gemini Synthesis</div>
+          <div class="flow-card-desc">Analyzes client questions against schema to architect tailored KPIs and multi-table analyses.</div>
         </div>
-
-        <div class="cheat-card">
-          <h4>Weighted Average Unit Price</h4>
-          <div class="cheat-desc">Avoids the mathematical blunder of unweighted averages.</div>
-          <div class="cheat-formula">=Total_Revenue / Total_Units</div>
+        <div class="flow-card">
+          <div class="flow-card-num font-display">STAGE 3</div>
+          <div class="flow-card-title">Zero-Hallucination Gate</div>
+          <div class="flow-card-desc">Every metric and dimension strictly validated and bound to existing columns in your file.</div>
         </div>
-
-        <div class="cheat-card">
-          <h4>XLOOKUP Dimension Matching</h4>
-          <div class="cheat-desc">Modern, robust replacement for VLOOKUP without column indices.</div>
-          <div class="cheat-formula">=XLOOKUP(A2, DataTable[ID], DataTable[Product], "N/A")</div>
+        <div class="flow-card">
+          <div class="flow-card-num font-display">STAGE 4</div>
+          <div class="flow-card-title">OpenXML Compilation</div>
+          <div class="flow-card-desc">Compiles formulas, native charts, COM slicers, and pre-evaluated calculation cache into .xlsx.</div>
         </div>
       </div>
     </div>
 
+    <!-- Section 3: Native Slicers & OpenXML Cache -->
+    <div class="doc-section">
+      <h2 class="doc-sec-title font-display">
+        <span class="sticker sticker-blue">03</span>
+        <span>Native Slicers &amp; OpenXML Calculation Cache</span>
+      </h2>
+      <p class="doc-text">
+        Microsoft Excel requires OpenXML calculation tags <span class="code-pill">&lt;v&gt;value&lt;/v&gt;</span> cached inside formula cells <span class="code-pill">&lt;f&gt;formula&lt;/f&gt;</span> so when a user opens the workbook on Windows, Mac, or mobile, all values appear immediately without displaying blank cells or requiring manual calculation refreshes.
+      </p>
+      <p class="doc-text">
+        On Windows environments, ExcelFlow coordinates with the Windows COM automation subsystem to bind true native PivotTables and interactive graphical Slicers directly to the workbook.
+      </p>
+    </div>
   </main>
 
   
   <footer>
-    <div class="footer-container">
-      <ul class="footer-nav">
+    <div class="container footer-content">
+      <div class="sticker sticker-excel">Institutional Spreadsheet Engine</div>
+      <ul class="footer-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="maker.html">Excel Maker Studio</a></li>
         <li><a href="info.html">Technical Architecture</a></li>
         <li><a href="tools.html">Data Utilities</a></li>
-        <li><a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download>Download Reference Workbook</a></li>
+        <li><a href="Sales_Executive_Dashboard_Submission_Ready.xlsx" download>Sample .xlsx</a></li>
       </ul>
-      <div><strong>ExcelFlow Platform</strong> — Institutional Client Data to Executive Excel Workbooks</div>
-      <div>100% Dynamic Formulas • Real Slicers &amp; Charts • Zero Hallucination Guarantee</div>
+      <div class="footer-bottom">
+        <strong>ExcelFlow Platform</strong> • 100% Dynamic Formulas • Real Slicers &amp; OpenXML Cache • Zero Hallucination Guarantee
+      </div>
     </div>
   </footer>
+  <script>
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    if (mobileBtn && mobileDrawer) {
+      mobileBtn.addEventListener('click', () => {
+        mobileDrawer.classList.toggle('open');
+      });
+    }
+  </script>
 
 </body>
 </html>
